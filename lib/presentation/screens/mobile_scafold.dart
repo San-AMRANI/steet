@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:steet/presentation/rooms/pages/profile_page.dart';
-import 'package:steet/presentation/rooms/pages/home_page.dart';
+import 'package:steet/presentation/profile/pages/profile_page.dart';
+import 'package:steet/presentation/home/pages/home_page.dart';
 
 class MobileScafold extends StatefulWidget {
   const MobileScafold({super.key});

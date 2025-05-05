@@ -156,7 +156,7 @@ class RoomDetailsPage extends StatelessWidget {
                           ],
                         ),
                       ),
-                    const SizedBox(
+                    SizedBox(
                       height: 16,
                     ),
                     Text(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:steet/presentation/rooms/pages/welcome_page.dart';
-import 'package:steet/screens/mobile_scafold.dart';
+import 'package:steet/presentation/screens/mobile_scafold.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

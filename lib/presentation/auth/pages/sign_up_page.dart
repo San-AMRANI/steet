@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:steet/presentation/widgets/my_text_field.dart';
+import 'package:steet/presentation/widgets/new_password.dart';
 
 class SignUpPages extends StatefulWidget {
   const SignUpPages({super.key});
@@ -11,6 +12,7 @@ class SignUpPages extends StatefulWidget {
 
 class _SignUpPagesState extends State<SignUpPages> {
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
   final emailController = TextEditingController();
   final nameController = TextEditingController();
   final majorController = TextEditingController();
@@ -171,16 +173,13 @@ class _SignUpPagesState extends State<SignUpPages> {
           ),
           TextButton(
             onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                // Perform sign-in action
-                setState(() {
-                  signInRequired = true;
-                });
-              } else {
-                setState(() {
-                  _errorMessage = 'Please fill in all fields correctly.';
-                });
-              }
+              _showModalBottomSheet();
+              // if (_formKey.currentState!.validate()) {
+              // } else {
+              //   setState(() {
+              //     _errorMessage = 'Please fill in all fields correctly.';
+              //   });
+              // }
             },
             style: TextButton.styleFrom(
               elevation: 3.0,
@@ -193,7 +192,7 @@ class _SignUpPagesState extends State<SignUpPages> {
             child: const Padding(
               padding: EdgeInsets.symmetric(horizontal: 25, vertical: 0),
               child: Text(
-                'Sign Up',
+                'Create Password',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
@@ -204,6 +203,83 @@ class _SignUpPagesState extends State<SignUpPages> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _showModalBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      // backgroundColor: Colors.white,
+      isScrollControlled: true,
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          top: 16,
+          left: 16,
+          right: 16,
+        ),
+        child: SizedBox(
+          height: 350,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Align(
+                alignment: Alignment.center,
+                child: Text(
+                  "Create a new password",
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              NewPasswordWidget(
+                passwordController: passwordController,
+                confirmPasswordController: confirmPasswordController,
+                formKey: _formKey,
+              ),
+              const SizedBox(height: 20),
+              Center(
+                child: TextButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Handle sign-up logic here
+                      // Navigator.pop(context);
+                    } else {
+                      setState(() {
+                        _errorMessage = 'Please fill in all fields correctly.';
+                      });
+                    }
+                  },
+                  style: TextButton.styleFrom(
+                    elevation: 3.0,
+                    backgroundColor: Theme.of(context).colorScheme.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(60),
+                    ),
+                  ),
+                  child: const Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 25, vertical: 0),
+                    child: Text(
+                      'Sign Up',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

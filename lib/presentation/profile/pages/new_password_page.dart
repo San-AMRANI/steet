@@ -1,15 +1,52 @@
 import 'package:flutter/material.dart';
+import 'package:steet/presentation/widgets/new_password.dart';
 import 'package:steet/presentation/widgets/subpage_appbar.dart';
 
 class NewPasswordPage extends StatelessWidget {
-  const NewPasswordPage({super.key});
+  // Controllers for the text fields
+  final TextEditingController newPasswordController = TextEditingController();
+  final TextEditingController confirmPasswordController = TextEditingController();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+  NewPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+  final theme = Theme.of(context);
+
     return Scaffold(
       appBar: SubPageAppBar(title: "New Password", avatarUrl: "https://www.amranihassan.site/avatar.png"),
-      body: const Center(
-        child: Text('New Password Page Content'),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              //! we may add an email confirmation field here
+              NewPasswordWidget(
+                passwordController: newPasswordController,
+                confirmPasswordController: confirmPasswordController,
+                formKey: formKey,
+                title: "Create a new password",
+              ),
+              const Spacer(),
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: theme.colorScheme.primary,
+                    foregroundColor: theme.colorScheme.onPrimary,
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  ),
+                  onPressed: () {
+                    // Handle save logic here
+                  },
+                  child: const Text('Save Password', style: TextStyle(fontSize: 16)),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

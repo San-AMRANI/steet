@@ -6,19 +6,14 @@ class PrvRoomModel extends RoomModel {
   final List<String> memberships;
 
   PrvRoomModel({
-    required String id,
-    required String name,
-    required String description,
-    required DateTime createdAt,
+    required super.id,
+    required super.name,
+    required super.description,
+    required super.createdAt,
     required this.isPrivate,
     required this.createdBy,
     required this.memberships,
-  }) : super(
-          id: id,
-          name: name,
-          description: description,
-          createdAt: createdAt,
-        );
+  });
 
   factory PrvRoomModel.fromJson(Map<String, dynamic> json) {
     return PrvRoomModel(

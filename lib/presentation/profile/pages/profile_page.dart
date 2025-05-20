@@ -40,7 +40,7 @@ class ProfilePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 15),
                 Text(
-                  'John Doe',
+                  'Amrani Hassan',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,

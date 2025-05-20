@@ -1,0 +1,45 @@
+import 'package:steet/domain/entities/student.dart';
+import 'package:steet/domain/repositories/student_repository.dart';
+import 'package:steet/data/data_sources/student_data_source.dart';
+
+class StudentRepositoryImp implements StudentRepository {
+  final StudentDataSource dataSource;
+
+  StudentRepositoryImp({required this.dataSource});
+
+  @override
+  Future<List<Student>> getStudents() async {
+    final studentModels = await dataSource.getStudents();
+    return studentModels.map((model) => model.toEntity()).toList();
+  }
+
+  // @override
+  // Future<Student?> getStudentById(String id) async {
+  //   try {
+  //     final studentModel = await dataSource.getStudentById(id);
+  //     return studentModel.toEntity();
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
+
+  // @override
+  // Future<Student?> getStudentByEmail(String email) async {
+  //   try {
+  //     final studentModel = await dataSource.getStudentByEmail(email);
+  //     return studentModel.toEntity();
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
+
+  // @override
+  // Future<Student?> getStudentByUserName(String userName) async {
+  //   try {
+  //     final studentModel = await dataSource.getStudentByUsername(userName);
+  //     return studentModel.toEntity();
+  //   } catch (e) {
+  //     return null;
+  //   }
+  // }
+}

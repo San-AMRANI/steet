@@ -6,18 +6,13 @@ class GraphQLService {
   late final GraphQLClient _client;
   
   // Your GraphQL server URL
-  final String _graphQLEndpoint = 'http://your-server-url/graphql';
-  
+  final String _graphQLEndpoint = 'http://192.168.31.184:8008/graphql';
   GraphQLService._() {
+  // print('GraphQL endpointhhhhhhhhhhhhhhhhhhhh: $_graphQLEndpoint');
     final HttpLink httpLink = HttpLink(_graphQLEndpoint);
     
-    // If you need authentication
-    final AuthLink authLink = AuthLink(
-      getToken: () async => 'Bearer <your-token>', // Replace with your auth token logic
-    );
-    
-    final Link link = authLink.concat(httpLink);
-    
+    final Link link = httpLink;
+
     _client = GraphQLClient(
       link: link,
       cache: GraphQLCache(),

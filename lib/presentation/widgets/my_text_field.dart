@@ -39,22 +39,65 @@ class MyTextField extends StatelessWidget {
       focusNode: focusNode,
       onTap: onTap,
       onChanged: onChanged,
+      style: TextStyle(
+        color: Theme.of(context).colorScheme.onSurface,
+        fontSize: 16,
+      ),
       decoration: InputDecoration(
         suffixIcon: suffixIcon,
-        prefixIcon: prefixIcon != null ? Icon(prefixIcon) : null,
-        floatingLabelBehavior: FloatingLabelBehavior.auto,
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2.0),
-        ),
-        fillColor: Colors.grey.shade200,
+        prefixIcon: prefixIcon != null
+            ? Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: Icon(
+                  prefixIcon,
+                ),
+              )
+            : null,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         filled: true,
+        fillColor: Theme.of(context).colorScheme.surface,
         labelText: labelText,
+        labelStyle: TextStyle(
+          color: Theme.of(context).colorScheme.primary,
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[500]),
+        hintStyle: TextStyle(
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: .5),
+          fontSize: 14,
+        ),
         errorText: errorMsg,
+        errorStyle: const TextStyle(fontSize: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.outline.withValues(alpha: .5),
+            width: 1.5,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.primary,
+            width: 2,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 1.5,
+          ),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: BorderSide(
+            color: Theme.of(context).colorScheme.error,
+            width: 2,
+          ),
+        ),
       ),
       validator: validator,
     );

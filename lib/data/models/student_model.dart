@@ -1,23 +1,23 @@
 import '../../domain/entities/student.dart';
 
-class StudentModel extends Student {
+class StudentModel{
+  final String id;
+  final String firstName;
+  final String lastName;
+  final String userName;
+  final String email;
+  final DateTime dob;
+  final String major;
+  
   StudentModel({
-    required String id,
-    required String firstName,
-    required String lastName,
-    required String userName,
-    required String email,
-    required DateTime dob,
-    required String major,
-  }) : super(
-          id: id,
-          firstName: firstName,
-          lastName: lastName,
-          userName: userName,
-          email: email,
-          dob: dob,
-          major: major,
-        );
+    required this.id,
+    required this.firstName,
+    required this.lastName,
+    required this.userName,
+    required this.email,
+    required this.dob,
+    required this.major,
+  });
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
     return StudentModel(
@@ -31,6 +31,7 @@ class StudentModel extends Student {
     );
   }
 
+  
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -41,5 +42,23 @@ class StudentModel extends Student {
       'dob': dob.toIso8601String(),
       'major': major,
     };
+  }
+
+  Student toEntity() {
+    return Student(
+      id: id,
+      firstName: firstName,
+      lastName: lastName,
+      userName: userName,
+      email: email,
+      dob: dob,
+      major: major,
+    );
+  }
+
+
+  @override
+  String toString() {
+    return 'StudentModel{id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, email: $email, dob: $dob, major: $major}';
   }
 }

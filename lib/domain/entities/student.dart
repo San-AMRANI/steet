@@ -1,4 +1,6 @@
 
+import 'package:steet/data/models/student_model.dart';
+
 class Student {
   final String id;
   final String firstName;
@@ -40,6 +42,20 @@ class Student {
       'dob': dob,
       'major': major,
     };
+  }
+
+  
+
+  StudentModel toModel() {
+    return StudentModel(
+      id: id,
+      firstName: firstName,
+      lastName: lastName,
+      userName: userName,
+      email: email,
+      dob: dob,
+      major: major,
+    );
   }
 
   @override

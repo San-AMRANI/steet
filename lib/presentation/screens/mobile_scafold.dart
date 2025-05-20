@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:steet/presentation/profile/pages/profile_page.dart';
 import 'package:steet/presentation/home/pages/home_page.dart';
+import 'package:steet/presentation/rooms/pages/pub_room_list_page_riverpod.dart';
 
 class MobileScafold extends StatefulWidget {
   const MobileScafold({super.key});
@@ -19,7 +20,7 @@ class _MobileScafoldState extends State<MobileScafold> {
   }
 
   final List<Widget> _pages = [
-    const HomePage(),
+    const PubRoomListPage(),
     const Center(child: Text('Rooms Page')),
     const ProfilePage(),
   ];

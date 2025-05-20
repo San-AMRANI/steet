@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:steet/presentation/auth/pages/sign_in_page.dart';
 import 'package:steet/presentation/auth/pages/sign_up_page.dart';
 
+
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
 
@@ -27,6 +28,8 @@ class _WelcomePageState extends State<WelcomePage>
 
   @override
   Widget build(BuildContext context) {
+
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: SingleChildScrollView(

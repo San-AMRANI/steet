@@ -1,4 +1,3 @@
-import 'package:uuid/uuid.dart';
 
 class RoomModel {
   final String id;

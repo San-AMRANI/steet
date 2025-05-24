@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:steet/presentation/rooms/pages/room_details_page.dart';
+import 'package:steet/domain/entities/pub_room.dart';
 
 class RoomsList1 extends StatelessWidget {
   final String categoryTitle;
-  final int itemCount;
-  final String Function(int) itemLabelBuilder;
+  final List<PubRoom> rooms;
 
   const RoomsList1({
     super.key,
     required this.categoryTitle,
-    required this.itemCount,
-    required this.itemLabelBuilder,
+    required this.rooms,
   });
 
   @override
@@ -31,24 +30,23 @@ class RoomsList1 extends StatelessWidget {
           height: 180,
           child: PageView.builder(
             controller: PageController(viewportFraction: 0.85),
-            itemCount: itemCount,
+            itemCount: rooms.length,
             itemBuilder: (context, index) {
+              final room = rooms[index];
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0, bottom: 0),
                 child: GestureDetector(
                   onTap: () {
-                    // Handle tap event
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RoomDetailsPage(),
+                        builder: (context) => RoomDetailsPage(room: room),
                       ),
                     );
                   },
                   child: Container(
                     alignment: Alignment.bottomLeft,
-                    padding: const EdgeInsets.only(
-                        bottom: 0), // Adjust padding to reduce space
+                    padding: const EdgeInsets.only(bottom: 0),
                     decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.primary,
                       border: Border.all(
@@ -61,24 +59,24 @@ class RoomsList1 extends StatelessWidget {
                       contentPadding:
                           const EdgeInsets.only(right: 2, left: 10, bottom: 0),
                       title: Text(
-                        itemLabelBuilder(index),
+                        room.name,
                         style: const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: const Text(
-                        "#tags, #tags, #tags, #tags",
-                        style: TextStyle(
+                      subtitle: Text(
+                        room.description,
+                        style: const TextStyle(
                           color: Colors.white70,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
                       trailing: IconButton(
-                        iconSize: 24, // Adjust the icon size here
+                        iconSize: 24,
                         icon: const CircleAvatar(
-                          radius: 18, // Adjust the CircleAvatar size here
+                          radius: 18,
                           backgroundImage:
                               AssetImage('lib/assets/images/logo.png'),
                           backgroundColor: Colors.white,

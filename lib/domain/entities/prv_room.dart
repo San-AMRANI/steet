@@ -9,6 +9,7 @@ class PrvRoom extends Room {
     required super.id,
     required super.name,
     required super.description,
+    required super.imageUrl,
     required super.createdAt,
     required this.isPrivate,
     required this.createdBy,
@@ -24,6 +25,7 @@ class PrvRoom extends Room {
       isPrivate: json['isPrivate'] as bool,
       createdBy: json['createdBy'] as String,
       memberships: List<String>.from(json['memberships']),
+      imageUrl: json['imageUrl'] as String,
     );
   }
 
@@ -33,6 +35,7 @@ class PrvRoom extends Room {
     json['isPrivate'] = isPrivate;
     json['createdBy'] = createdBy;
     json['memberships'] = memberships;
+    json['imageUrl'] = imageUrl;
     return json;
   }
 }

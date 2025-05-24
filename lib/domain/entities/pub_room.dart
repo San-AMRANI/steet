@@ -8,6 +8,7 @@ class PubRoom extends Room {
     required super.id,
     required super.name,
     required super.description,
+    required super.imageUrl,
     required super.createdAt,
     required this.participation,
   });
@@ -17,6 +18,7 @@ class PubRoom extends Room {
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String,
+      imageUrl: json['imageUrl'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
       participation: (json['participation'] as List<dynamic>)
           .map((p) => Participation(

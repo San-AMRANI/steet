@@ -9,6 +9,7 @@ class PrvRoomModel extends RoomModel {
     required super.id,
     required super.name,
     required super.description,
+    required super.imageUrl,
     required super.createdAt,
     required this.isPrivate,
     required this.createdBy,
@@ -24,6 +25,7 @@ class PrvRoomModel extends RoomModel {
       isPrivate: json['isPrivate'],
       createdBy: json['createdBy'],
       memberships: List<String>.from(json['memberships']),
+      imageUrl: json['imageUrl'],
     );
   }
 
@@ -33,6 +35,7 @@ class PrvRoomModel extends RoomModel {
     json['isPrivate'] = isPrivate;
     json['createdBy'] = createdBy;
     json['memberships'] = memberships;
+    json['imageUrl'] = imageUrl;
     return json;
   }
 }

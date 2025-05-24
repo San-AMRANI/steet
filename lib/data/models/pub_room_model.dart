@@ -9,6 +9,7 @@ class PubRoomModel extends RoomModel {
     required super.id,
     required super.name,
     required super.description,
+    required super.imageUrl,
     required super.createdAt,
     required this.participation,
   });
@@ -19,7 +20,8 @@ class PubRoomModel extends RoomModel {
       name: json['name'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      participation: json['participation'] != null 
+      imageUrl: json['imageUrl'] as String,
+      participation: json['participation'] != null
           ? (json['participation'] as List<dynamic>)
               .map((p) => ParticipationModel.fromJson(p))
               .toList()
@@ -39,6 +41,7 @@ class PubRoomModel extends RoomModel {
       id: id,
       name: name,
       description: description,
+      imageUrl: imageUrl,
       createdAt: createdAt,
       participation: participation.map((p) => p.toEntity()).toList(),
     );

@@ -13,15 +13,25 @@ class StudentRepositoryImp implements StudentRepository {
     return studentModels.map((model) => model.toEntity()).toList();
   }
 
-  // @override
-  // Future<Student?> getStudentById(String id) async {
-  //   try {
-  //     final studentModel = await dataSource.getStudentById(id);
-  //     return studentModel.toEntity();
-  //   } catch (e) {
-  //     return null;
-  //   }
-  // }
+  @override
+  Future<Student?> getStudentById(String id) async {
+    try {
+      final studentModel = await dataSource.getStudentById(id);
+      return studentModel.toEntity();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  @override
+  Future<Student?> updateStudent(Student student) async {
+    try {
+      final studentModel = await dataSource.updateStudent(student.toModel());
+      return studentModel.toEntity();
+    } catch (e) {
+      return null;
+    }
+  }
 
   // @override
   // Future<Student?> getStudentByEmail(String email) async {

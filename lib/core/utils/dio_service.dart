@@ -45,6 +45,24 @@ class DioService {
     }
   }
 
+  Future<Map<String, dynamic>> put(String endpoint, {dynamic data}) async {
+    try {
+      final response = await _dio.put(endpoint, data: data);
+      
+      if (response.statusCode != 200) {
+        throw Exception('Server returned status code ${response.statusCode}');
+      }
+      
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Expected JSON object response, got ${response.data.runtimeType}');
+      }
+      
+      return response.data;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
   Exception _handleError(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:

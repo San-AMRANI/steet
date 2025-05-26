@@ -14,6 +14,19 @@ class StudentDataSource {
     final List<dynamic> studentsData = data['data'] as List<dynamic>;
     return studentsData.map((student) => StudentModel.fromJson(student)).toList();
   }
-  
+
+  Future<StudentModel> getStudentById(String id) async {
+    final data = await _dioService.get(ApiEndpoints.studentById.replaceFirst('{id}', id));
+    return StudentModel.fromJson(data);
+  }
+
+  Future<StudentModel> updateStudent(StudentModel student) async {
+    final data = await _dioService.put(
+      ApiEndpoints.createUpdateStudent,
+      data: student.toJson(),
+    );
+    
+    return StudentModel.fromJson(data);
+  }
   // Rest of implementation...
 }

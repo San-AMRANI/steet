@@ -12,17 +12,19 @@ class MobileScafold extends StatefulWidget {
 
 class _MobileScafoldState extends State<MobileScafold> {
   int _selectedIndex = 0;
+
+  final List<Widget> _pages = [
+    HomePage(),
+    Center(child: Text('Create Page')), // Replace with your actual Create page widget if needed
+    ProfilePage(),
+  ];
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+    // Removed Navigator.pushReplacementNamed to fix navigation
   }
-
-  final List<Widget> _pages = [
-    const HomePage(),
-    const Center(child: Text('Rooms Page')),
-    const ProfilePage(),
-  ];
   
   @override
   Widget build(BuildContext context) {

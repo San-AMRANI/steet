@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive API Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #4285F4;
+            text-align: center;
+        }
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #3367D6;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+            display: none;
+        }
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4285F4;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .preview-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #imagePreview {
+            max-width: 100%;
+            max-height: 300px;
+            display: none;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .result-container {
+            margin-top: 20px;
+            display: none;
+        }
+        #uploadedImage {
+            max-width: 100%;
+            max-height: 300px;
+            margin: 10px auto;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .credentials-container {
+            margin-bottom: 20px;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+        }
+        .button-group {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #response {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 15px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .note {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        .auth-status {
+            padding: 5px 10px;
+            border-radius: 3px;
+            display: inline-block;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+        .auth-connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .auth-disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Google Drive API Test</h1>
+    <div class="container">
+        <div class="credentials-container">
+            <h3>Google Drive API Credentials</h3>
+            <div class="form-group">
+                <label for="apiKey">API Key:</label>
+                <input type="text" id="apiKey" value="AIzaSyAkTN2UrQ1Xqy68MnumVL58xrNUAmlO_dE">
+            </div>
+            <div class="form-group">
+                <label for="serviceAccount">Service Account Email:</label>
+                <input type="text" id="serviceAccount" value="service-account@my-project-460811.iam.gserviceaccount.com">
+            </div>
+            <div class="form-group">
+                <label for="serviceAccountKey">Service Account Key File (JSON):</label>
+                <input type="file" id="serviceAccountKey" accept="application/json">
+                <p class="note">Upload the JSON key file for your service account</p>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="fileInput">Select Image to Upload:</label>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="preview-container">
+            <img id="imagePreview" alt="Image Preview">
+        </div>
+
+        <div class="button-group">
+            <button id="authenticateButton">Authenticate Service Account</button>
+            <button id="uploadButton" disabled>Upload to Google Drive</button>
+            <button id="listFilesButton" disabled>List Files in Drive</button>
+            <button id="testConnectionButton" disabled>Test API Connection</button>
+        </div>
+        
+        <div id="authStatus" class="auth-status auth-disconnected">Not Authenticated</div>
+
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p id="loadingText">Processing...</p>
+        </div>
+
+        <div id="status" class="status" style="display: none;"></div>
+
+        <div id="response"></div>
+
+        <div id="resultContainer" class="result-container">
+            <h3>Upload Result</h3>
+            <p>File ID: <span id="fileId"></span></p>
+            <p>View URL: <a id="fileLink" target="_blank"></a></p>
+            <img id="uploadedImage" alt="Uploaded Image">
+        </div>
+    </div>
+
+    <!-- Load the Google API client library -->
+    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="https://accounts.google.com/gsi/client"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.27/jsrsasign-all-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        // DOM elements
+        const apiKeyInput = document.getElementById('apiKey');
+        const serviceAccountInput = document.getElementById('serviceAccount');
+        const serviceAccountKeyInput = document.getElementById('serviceAccountKey');
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const listFilesButton = document.getElementById('listFilesButton');
+        const testConnectionButton = document.getElementById('testConnectionButton');
+        const authenticateButton = document.getElementById('authenticateButton');
+        const authStatusDiv = document.getElementById('authStatus');
+        const statusDiv = document.getElementById('status');
+        const loadingDiv = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        const resultContainer = document.getElementById('resultContainer');
+        const fileIdSpan = document.getElementById('fileId');
+        const fileLink = document.getElementById('fileLink');
+        const imagePreview = document.getElementById('imagePreview');
+        const uploadedImage = document.getElementById('uploadedImage');
+        const responseDiv = document.getElementById('response');
+
+        // Service account credentials
+        let serviceAccountCredentials = null;
+        let serviceAccountToken = null;
+
+        // Utility functions
+        function showLoading(text) {
+            loadingText.textContent = text;
+            loadingDiv.style.display = 'block';
+        }
+
+        function hideLoading() {
+            loadingDiv.style.display = 'none';
+        }
+
+        function showStatus(message, isError) {
+            statusDiv.textContent = message;
+            statusDiv.className = isError ? 'status error' : 'status success';
+            statusDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                statusDiv.style.display = 'none';
+            }, 5000);
+        }
+
+        function handleApiError(error, context) {
+            console.error(context + ':', error);
+            let errorMessage = error.message || 'Unknown error';
+            
+            if (error.result && error.result.error) {
+                errorMessage = error.result.error.message || errorMessage;
+            }
+            
+            showStatus(context + ': ' + errorMessage, true);
+            responseDiv.textContent = JSON.stringify(error, null, 2);
+        }
+
+        // Handle file selection for preview
+        fileInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                if (serviceAccountToken) {
+                    uploadButton.disabled = false;
+                }
+                
+                // Show image preview
+                if (file.type.match('image.*')) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        imagePreview.src = e.target.result;
+                        imagePreview.style.display = 'block';
+                    };
+                    
+                    reader.readAsDataURL(file);
+                } else {
+                    imagePreview.style.display = 'none';
+                    showStatus('Please select an image file', true);
+                }
+            } else {
+                uploadButton.disabled = true;
+                imagePreview.style.display = 'none';
+            }
+        });
+
+        // Handle service account key file selection
+        serviceAccountKeyInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        serviceAccountCredentials = JSON.parse(e.target.result);
+                        
+                        // Ensure private key is properly formatted
+                        if (serviceAccountCredentials.private_key) {
+                            serviceAccountCredentials.private_key = serviceAccountCredentials.private_key
+                                .replace(/\\n/g, '\n');
+                        }
+                        
+                        showStatus('Service account key file loaded', false);
+                        authenticateButton.disabled = false;
+                    } catch (error) {
+                        showStatus('Invalid JSON key file: ' + error.message, true);
+                        serviceAccountCredentials = null;
+                        authenticateButton.disabled = true;
+                    }
+                };
+                
+                reader.readAsText(file);
+            } else {
+                serviceAccountCredentials = null;
+            }
+        });
+
+        // Authenticate with service account
+        authenticateButton.addEventListener('click', async function() {
+            showLoading('Authenticating service account...');
+            responseDiv.textContent = '';
+            
+            try {
+                if (!serviceAccountCredentials) {
+                    throw new Error('Please upload a service account key file');
+                }
+                
+                // Initialize the Google API client with API key
+                await initializeGoogleAPI();
+                
+                // Generate JWT token for service account authentication
+                const token = await generateServiceAccountToken();
+                serviceAccountToken = token;
+                
+                // Enable buttons after authentication
+                uploadButton.disabled = fileInput.files.length === 0;
+                listFilesButton.disabled = false;
+                testConnectionButton.disabled = false;
+                
+                // Update authentication status
+                authStatusDiv.textContent = 'Authenticated';
+                authStatusDiv.className = 'auth-status auth-connected';
+                
+                showStatus('Service account authenticated successfully!', false);
+                responseDiv.textContent = 'Authentication successful. Token acquired.';
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showStatus('Authentication error: ' + error.message, true);
+                
+                // Show more detailed error information
+                let errorDetails = {
+                    message: error.message,
+                    stack: error.stack
+                };
+                
+                // If we have service account info, include parts of it for debugging (omit private key)
+                if (serviceAccountCredentials) {
+                    errorDetails.serviceAccountInfo = {
+                        client_email: serviceAccountCredentials.client_email,
+                        project_id: serviceAccountCredentials.project_id,
+                        token_uri: serviceAccountCredentials.token_uri,
+                        type: serviceAccountCredentials.type
+                    };
+                }
+                
+                responseDiv.textContent = JSON.stringify(errorDetails, null, 2);
+                
+                // Update authentication status
+                authStatusDiv.textContent = 'Not Authenticated';
+                authStatusDiv.className = 'auth-status auth-disconnected';
+            }
+            
+            hideLoading();
+        });
+
+        // Initialize the Google API client
+        function initializeGoogleAPI() {
+            return new Promise((resolve, reject) => {
+                gapi.load('client', async () => {
+                    try {
+                        await gapi.client.init({
+                            apiKey: apiKeyInput.value,
+                            discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/drive/v3/rest'],
+                        });
+                        resolve();
+                    } catch (error) {
+                        reject(error);
+                    }
+                });
+            });
+        }
+
+        // Generate a JWT token for service account authentication
+        async function generateServiceAccountToken() {
+            if (!serviceAccountCredentials) {
+                throw new Error('Service account credentials not loaded');
+            }
+            
+            // Create a JWT header
+            const header = {
+                alg: 'RS256',
+                typ: 'JWT',
+                kid: serviceAccountCredentials.private_key_id
+            };
+            
+            // Create a JWT payload
+            const now = Math.floor(Date.now() / 1000);
+            const payload = {
+                iss: serviceAccountCredentials.client_email,
+                scope: 'https://www.googleapis.com/auth/drive',
+                aud: 'https://oauth2.googleapis.com/token',
+                exp: now + 3600, // 1 hour
+                iat: now
+            };
+            
+            // Sign the JWT
+            let signedJwt;
+            try {
+                signedJwt = await signJWT(header, payload, serviceAccountCredentials.private_key);
+                console.log('JWT generated successfully');
+            } catch (jwtError) {
+                console.error('JWT signing failed:', jwtError);
+                throw new Error('Could not generate JWT token: ' + jwtError.message);
+            }
+            
+            // Exchange JWT for access token
+            const response = await fetch('https://oauth2.googleapis.com/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: new URLSearchParams({
+                    grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                    assertion: signedJwt
+                })
+            });
+            
+            const responseData = await response.json();
+            
+            if (!response.ok) {
+                console.error('Token exchange error details:', responseData);
+                const errorMsg = responseData.error_description || responseData.error || 'Unknown error';
+                throw new Error('Token exchange failed: ' + errorMsg);
+            }
+            
+            // Set the token in gapi client
+            gapi.client.setToken({
+                access_token: responseData.access_token,
+                expires_in: responseData.expires_in
+            });
+            
+            return responseData.access_token;
+        }
+
+        // JWT signing function using the service account's private key
+        async function signJWT(header, payload, privateKey) {
+            console.warn('SECURITY WARNING: JWT signing with private keys should be done server-side in production!');
+            console.log('Signing JWT with header:', header);
+            console.log('Payload:', payload);
+            
+            // Base64Url encode the header and payload
+            const base64UrlEncode = (str) => {
+                let base64 = btoa(JSON.stringify(str));
+                return base64
+                    .replace(/\+/g, '-')
+                    .replace(/\//g, '_')
+                    .replace(/=+$/, '');
+            };
+            
+            const encodedHeader = base64UrlEncode(header);
+            const encodedPayload = base64UrlEncode(payload);
+            
+            // Create the content to be signed
+            const signContent = `${encodedHeader}.${encodedPayload}`;
+            console.log('Content to sign:', signContent);
+            
+            try {
+                // Check if jsrsasign library is loaded
+                if (!window.KJUR) {
+                    throw new Error('jsrsasign library not loaded');
+                }
+
+                // Try KJUR.jws.JWS.sign method first (more reliable)
+                try {
+                    console.log('Trying JWS sign method...');
+                    const jws = KJUR.jws.JWS.sign(
+                        "RS256", 
+                        JSON.stringify(header), 
+                        JSON.stringify(payload), 
+                        privateKey
+                    );
+                    console.log('JWS signing successful');
+                    return jws;
+                } catch (jwsError) {
+                    console.error('JWS signing failed, trying alternative method:', jwsError);
+                }
+                
+                // Use jsrsasign to sign the JWT - fallback method
+                const sig = new KJUR.crypto.Signature({"alg": "SHA256withRSA"});
+                sig.init(privateKey);
+                sig.updateString(signContent);
+                const signatureBytes = sig.sign();
+                
+                // Convert signature to base64url encoding
+                let signature;
+                try {
+                    signature = btoa(KJUR.crypto.Util.hexToStr(signatureBytes));
+                } catch (hexError) {
+                    console.error('Error with hexToStr:', hexError);
+                    
+                    // Alternative approach using CryptoJS
+                    console.log('Trying CryptoJS approach...');
+                    const wordArray = CryptoJS.enc.Hex.parse(signatureBytes);
+                    const signatureStr = CryptoJS.enc.Base64.stringify(wordArray);
+                    signature = signatureStr;
+                }
+                signature = signature.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                
+                // Return the complete JWT
+                return `${signContent}.${signature}`;
+            } catch (error) {
+                console.error('Error signing JWT:', error);
+                console.error('KJUR object:', typeof KJUR, Object.keys(KJUR.crypto || {}));
+                
+                // Try a simpler approach for testing if KJUR signing fails
+                if (error.toString().includes('hex') || error.toString().includes('not a function')) {
+                    try {
+                        // For testing only: Create a mock signature (NOT SECURE, just for testing)
+                        console.warn('Using mock signature for testing only!');
+                        const mockSignature = btoa(`TESTING_ONLY_${Date.now()}`).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+                        return `${signContent}.${mockSignature}`;
+                    } catch (mockError) {
+                        console.error('Even mock signing failed:', mockError);
+                        throw new Error('JWT signing failed: ' + error.message + ' (Mock signing also failed)');
+                    }
+                }
+                
+                throw new Error('Failed to sign JWT: ' + error.message);
+            }
+        }
+
+        // Test connection to Google Drive API
+        testConnectionButton.addEventListener('click', async function() {
+            showLoading('Testing API connection...');
+            responseDiv.textContent = '';
+            
+            try {
+                if (!serviceAccountToken) {
+                    throw new Error('Please authenticate first');
+                }
+                
+                // Try to list files to test the connection
+                const response = await gapi.client.drive.files.list({
+                    pageSize: 5,
+                    fields: 'files(id, name, mimeType, webViewLink)'
+                });
+                
+                responseDiv.textContent = JSON.stringify(response.result, null, 2);
+                showStatus('API connection successful!', false);
+            } catch (error) {
+                handleApiError(error, 'Error connecting to API');
+            }
+            
+            hideLoading();
+        });
+
+        // List files in Google Drive
+        listFilesButton.addEventListener('click', async function() {
+            showLoading('Listing files...');
+            responseDiv.textContent = '';
+            
+            try {
+                if (!serviceAccountToken) {
+                    throw new Error('Please authenticate first');
+                }
+                
+                const response = await gapi.client.drive.files.list({
+                    pageSize: 20,
+                    fields: 'files(id, name, mimeType, webViewLink, thumbnailLink)'
+                });
+                
+                const files = response.result.files;
+                responseDiv.textContent = JSON.stringify(files, null, 2);
+                
+                if (files && files.length > 0) {
+                    showStatus(`Listed ${files.length} files from Google Drive`, false);
+                } else {
+                    showStatus('No files found in Google Drive', false);
+                }
+            } catch (error) {
+                handleApiError(error, 'Error listing files');
+            }
+            
+            hideLoading();
+        });
+
+        // Upload file to Google Drive
+        uploadButton.addEventListener('click', async function() {
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showStatus('Please select a file to upload', true);
+                return;
+            }
+            
+            if (!serviceAccountToken) {
+                showStatus('Please authenticate first', true);
+                return;
+            }
+            
+            showLoading('Uploading file to Google Drive...');
+            responseDiv.textContent = '';
+            resultContainer.style.display = 'none';
+            
+            try {
+                // Read the file as binary string
+                const content = await readFileAsArrayBuffer(file);
+                
+                // Create metadata for the file
+                const metadata = {
+                    name: file.name,
+                    parents: [] // Upload to root folder
+                };
+                
+                // Upload the file using multipart upload
+                const fileId = await uploadFileMultipart(metadata, content, file.type);
+                
+                // Make the file publicly accessible
+                await makeFilePublic(fileId);
+                
+                // Get the file details
+                const fileDetails = await gapi.client.drive.files.get({
+                    fileId: fileId,
+                    fields: 'id,name,webViewLink,webContentLink'
+                });
+                
+                // Display results
+                fileIdSpan.textContent = fileId;
+                fileLink.href = fileDetails.result.webViewLink;
+                fileLink.textContent = fileDetails.result.webViewLink;
+                
+                // Show uploaded image if it's an image
+                if (file.type.match('image.*')) {
+                    uploadedImage.src = `https://drive.google.com/uc?id=${fileId}`;
+                    uploadedImage.style.display = 'block';
+                }
+                
+                resultContainer.style.display = 'block';
+                showStatus('File uploaded successfully!', false);
+                responseDiv.textContent = JSON.stringify(fileDetails.result, null, 2);
+                
+            } catch (error) {
+                handleApiError(error, 'Error uploading file');
+            }
+            
+            hideLoading();
+        });
+
+        // Read file as ArrayBuffer
+        function readFileAsArrayBuffer(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    resolve(e.target.result);
+                };
+                reader.onerror = function(e) {
+                    reject(new Error('Failed to read file'));
+                };
+                reader.readAsArrayBuffer(file);
+            });
+        }
+
+        // Upload file content to Google Drive using multipart upload
+        async function uploadFileMultipart(metadata, content, mimeType) {
+            const boundary = '-------314159265358979323846';
+            const delimiter = "\r\n--" + boundary + "\r\n";
+            const close_delim = "\r\n--" + boundary + "--";
+            
+            let body = delimiter +
+                'Content-Type: application/json\r\n\r\n' +
+                JSON.stringify(metadata) + delimiter +
+                'Content-Type: ' + mimeType + '\r\n' +
+                'Content-Transfer-Encoding: base64\r\n\r\n' +
+                arrayBufferToBase64(content) +
+                close_delim;
+            
+            const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + serviceAccountToken,
+                    'Content-Type': 'multipart/related; boundary="' + boundary + '"'
+                },
+                body: body
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error('Upload failed: ' + response.status + ' ' + errorText);
+            }
+            
+            const result = await response.json();
+            return result.id;
+        }
+
+        // Convert ArrayBuffer to base64
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            const bytes = new Uint8Array(buffer);
+            const len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return btoa(binary);
+        }
+
+        // Make file publicly accessible
+        async function makeFilePublic(fileId) {
+            try {
+                await gapi.client.drive.permissions.create({
+                    fileId: fileId,
+                    resource: {
+                        role: 'reader',
+                        type: 'anyone'
+                    }
+                });
+                console.log('File made publicly accessible');
+            } catch (error) {
+                console.warn('Could not make file public:', error);
+                // Don't throw error, as the file was still uploaded successfully
+            }
+        }
+    </script>
+</body>
+</html>

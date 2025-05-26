@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:steet/domain/entities/student.dart';
+import 'package:steet/presentation/providers/student_provider.dart';
 
-import 'package:steet/presentation/widgets/my_text_field.dart';
 import 'package:steet/presentation/widgets/subpage_appbar.dart';
+import 'package:steet/presentation/profile/widgets/info_section.dart';
+import 'package:steet/presentation/profile/widgets/info_row.dart';
+import 'package:steet/presentation/profile/widgets/personal_info_bottom_sheet.dart';
+import 'package:steet/presentation/profile/widgets/account_details_bottom_sheet.dart';
+import 'package:steet/presentation/profile/widgets/additional_info_bottom_sheet.dart';
 
-class EditProfilePage extends StatefulWidget {
+class EditProfilePage extends ConsumerStatefulWidget {
   const EditProfilePage({
     super.key,
   });
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  ConsumerState<EditProfilePage> createState() => _EditProfilePageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   // Controllers for the text fields
   final firstNameController = TextEditingController();
   final lastNameController = TextEditingController();
@@ -24,7 +32,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   // Form key for validation
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
+  bool _controllersInitialized = false;
+  final String _studentId = '62257c22-5825-4fb8-9839-3bd001ce2c06';
   @override
   void dispose() {
     firstNameController.dispose();
@@ -36,184 +45,210 @@ class _EditProfilePageState extends State<EditProfilePage> {
     super.dispose();
   }
 
+  void _onSaveProfile() async {
+    final updatedStudent = Student(
+      id: _studentId,
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+      userName: userNameController.text,
+      email: emailController.text,
+      dob: DateTime.tryParse(dobController.text)!,
+      major: majorController.text,
+      // add other fields as needed
+    );
+
+    try {
+      await ref.read(updateStudentProvider(updatedStudent).future);
+      setState(() {}); // Refresh UI if needed
+      Navigator.pop(context); // Close the bottom sheet
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Profile updated successfully'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      Navigator.pop(context); // Close the bottom sheet
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Failed to update profile, please try again later!'),
+          duration: Duration(seconds: 2),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _showEditPersonalInfoBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return PersonalInfoBottomSheet(
+          firstNameController: firstNameController,
+          lastNameController: lastNameController,
+          formKey: formKey,
+          onSave: () => setState(_onSaveProfile),
+        );
+      },
+    );
+  }
+
+  void _showEditAccountDetailsBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return AccountDetailsBottomSheet(
+          userNameController: userNameController,
+          emailController: emailController,
+          formKey: formKey,
+          onSave: () => setState(_onSaveProfile),
+        );
+      },
+    );
+  }
+
+  void _showEditAdditionalInfoBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return AdditionalInfoBottomSheet(
+          dobController: dobController,
+          majorController: majorController,
+          formKey: formKey,
+          onSave: () => setState(_onSaveProfile),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final studentAsyncValue = ref.watch(studentProvider(_studentId));
 
-    return Scaffold(
-      appBar: SubPageAppBar(
-        title: 'Edit Profile',
-        avatarUrl: 'https://www.amranihassan.site/avatar.png',
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Personal Information',
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    MyTextField(
-                      labelText: 'First Name',
-                      hintText: 'Enter your first name',
-                      controller: firstNameController,
-                      obscureText: false,
-                      keyboardType: TextInputType.text,
-                      prefixIcon: CupertinoIcons.person,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'First name is required';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    MyTextField(
-                      labelText: 'Last Name',
-                      hintText: 'Enter your last name',
-                      controller: lastNameController,
-                      obscureText: false,
-                      keyboardType: TextInputType.text,
-                      prefixIcon: CupertinoIcons.person_fill,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Last name is required';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Account Details',
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    MyTextField(
-                      labelText: 'Username',
-                      hintText: 'Enter your username',
-                      controller: userNameController,
-                      obscureText: false,
-                      keyboardType: TextInputType.text,
-                      prefixIcon: CupertinoIcons.profile_circled,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Username is required';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 16),
-                    MyTextField(
-                      labelText: 'Email',
-                      hintText: 'Enter your email',
-                      controller: emailController,
-                      obscureText: false,
-                      keyboardType: TextInputType.emailAddress,
-                      prefixIcon: CupertinoIcons.mail,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Email is required';
-                        }
-                        if (!RegExp(
-                                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}")
-                            .hasMatch(value)) {
-                          return 'Enter a valid email address';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Additional Information',
-                      style: TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    GestureDetector(
-                      onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime(1980),
-                          lastDate: DateTime.now(),
-                        );
-                        if (pickedDate != null) {
-                          dobController.text =
-                              "${pickedDate.year}-${pickedDate.month.toString().padLeft(2, '0')}-${pickedDate.day.toString().padLeft(2, '0')}";
-                        }
-                      },
-                      child: AbsorbPointer(
-                        child: MyTextField(
-                          labelText: 'Date of Birth',
-                          hintText: 'Enter your date of birth',
-                          controller: dobController,
-                          obscureText: false,
-                          keyboardType: TextInputType.datetime,
-                          prefixIcon: CupertinoIcons.calendar,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Date of birth is required';
-                            }
-                            return null;
-                          },
+    return studentAsyncValue.when(
+      data: (student) {
+        if (student != null && !_controllersInitialized) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              firstNameController.text = student.firstName;
+              lastNameController.text = student.lastName;
+              userNameController.text = student.userName;
+              emailController.text = student.email;
+              dobController.text = student.dob
+                  .toIso8601String()
+                  .split('T')
+                  .first; // Format date as YYYY-MM-DD
+              majorController.text = student.major;
+              setState(() {
+                _controllersInitialized = true;
+              });
+            }
+          });
+        }
+
+        return Scaffold(
+          appBar: SubPageAppBar(
+            title: 'Profile',
+            avatarUrl: 'https://www.amranihassan.site/avatar.png',
+          ),
+          body: SafeArea(
+            child: SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Personal Information Section
+                        InfoSection(
+                          title: 'Full Name',
+                          onEditPressed: _showEditPersonalInfoBottomSheet,
+                          children: [
+                            InfoRow(
+                              label: 'First Name',
+                              value: firstNameController.text,
+                              icon: CupertinoIcons.person,
+                            ),
+                            const SizedBox(height: 12),
+                            InfoRow(
+                              label: 'Last Name',
+                              value: lastNameController.text,
+                              icon: CupertinoIcons.person_fill,
+                            ),
+                          ],
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    MyTextField(
-                      labelText: 'Major',
-                      hintText: 'Enter your major',
-                      controller: majorController,
-                      obscureText: false,
-                      keyboardType: TextInputType.text,
-                      prefixIcon: CupertinoIcons.book,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Major is required';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 32),
-                    Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.primary,
-                          foregroundColor: theme.colorScheme.onPrimary,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 12),
+
+                        const SizedBox(height: 24),
+
+                        // Account Details Section
+                        InfoSection(
+                          title: 'Account Details',
+                          onEditPressed: _showEditAccountDetailsBottomSheet,
+                          children: [
+                            InfoRow(
+                              label: 'Username',
+                              value: userNameController.text,
+                              icon: CupertinoIcons.profile_circled,
+                            ),
+                            const SizedBox(height: 12),
+                            InfoRow(
+                              label: 'Email',
+                              value: emailController.text,
+                              icon: CupertinoIcons.mail,
+                            ),
+                          ],
                         ),
-                        onPressed: () {
-                          if (formKey.currentState?.validate() ?? false) {
-                            // Handle save logic here
-                          }
-                        },
-                        child: const Text('Save Changes',
-                            style: TextStyle(fontSize: 16)),
-                      ),
+
+                        const SizedBox(height: 24),
+
+                        // Additional Information Section
+                        InfoSection(
+                          title: 'Additional Information',
+                          onEditPressed: _showEditAdditionalInfoBottomSheet,
+                          children: [
+                            InfoRow(
+                              label: 'Date of Birth',
+                              value: dobController.text,
+                              icon: CupertinoIcons.calendar,
+                            ),
+                            const SizedBox(height: 12),
+                            InfoRow(
+                              label: 'Major',
+                              value: majorController.text,
+                              icon: CupertinoIcons.book,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
+      loading: () =>
+          const Scaffold(body: Center(child: CircularProgressIndicator())),
+      error: (err, stack) => Scaffold(body: Center(child: Text('Error: $err'))),
     );
   }
 }

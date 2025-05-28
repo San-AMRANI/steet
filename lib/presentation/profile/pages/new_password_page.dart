@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:steet/domain/entities/student.dart';
 import 'package:steet/presentation/widgets/new_password.dart';
 import 'package:steet/presentation/widgets/subpage_appbar.dart';
 
@@ -7,15 +8,15 @@ class NewPasswordPage extends StatelessWidget {
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-
-  NewPasswordPage({super.key});
+  final Student? authStudent;
+  NewPasswordPage({super.key, this.authStudent});
 
   @override
   Widget build(BuildContext context) {
   final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: SubPageAppBar(title: "New Password", avatarUrl: "https://www.amranihassan.site/avatar.png"),
+      appBar: SubPageAppBar(title: "New Password", avatarUrl: authStudent?.profilePictureUrl ?? ""),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(

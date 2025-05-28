@@ -43,8 +43,27 @@ class MyTextIconButton extends StatelessWidget {
       ],
     );
 
-    return SizedBox(
-      width: isFullWidth ? double.infinity : null,
+    // Always use SizedBox for full width if isFullWidth is true
+    if (isFullWidth) {
+      return SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color ?? Theme.of(context).colorScheme.surface,
+            foregroundColor: textStyle?.color ?? Colors.black,
+            elevation: 0,
+            padding: padding ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(borderRadius),
+              side: border ?? BorderSide.none,
+            ),
+          ),
+          child: content,
+        ),
+      );
+    }
+    return IntrinsicWidth(
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
@@ -61,4 +80,5 @@ class MyTextIconButton extends StatelessWidget {
       ),
     );
   }
+
 }

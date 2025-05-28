@@ -9,6 +9,7 @@ class Student {
   final String email;
   final DateTime dob;
   final String major;
+  final String? profilePictureUrl;
 
   Student({
     required this.id,
@@ -18,6 +19,7 @@ class Student {
     required this.email,
     required this.dob,
     required this.major,
+    this.profilePictureUrl,
   });
 
   factory Student.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,29 @@ class Student {
       email: json['email'] as String,
       dob: DateTime.parse(json['dob'] as String),
       major: json['major'] as String,
+      profilePictureUrl: json['profilePictureUrl'] as String?,
+    );
+  }
+
+  Student copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    String? userName,
+    String? email,
+    DateTime? dob,
+    String? major,
+    String? profilePictureUrl,
+  }) {
+    return Student(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      userName: userName ?? this.userName,
+      email: email ?? this.email,
+      dob: dob ?? this.dob,
+      major: major ?? this.major,
+      profilePictureUrl: profilePictureUrl ?? this.profilePictureUrl,
     );
   }
 
@@ -41,6 +66,7 @@ class Student {
       'email': email,
       'dob': dob,
       'major': major,
+      'profilePictureUrl': profilePictureUrl,
     };
   }
 
@@ -52,6 +78,7 @@ class Student {
       firstName: firstName,
       lastName: lastName,
       userName: userName,
+      profilePictureUrl: profilePictureUrl,
       email: email,
       dob: dob,
       major: major,
@@ -60,6 +87,6 @@ class Student {
 
   @override
   String toString() {
-    return 'Student{id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, email: $email, dob: $dob, major: $major}';
+    return 'Student{id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, email: $email, dob: $dob, major: $major, profilePictureUrl: $profilePictureUrl}';
   }
 }

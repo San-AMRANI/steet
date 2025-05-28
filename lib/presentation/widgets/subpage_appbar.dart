@@ -24,9 +24,13 @@ class SubPageAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            title,
-            style: const TextStyle(fontSize: 20),
+          Flexible(
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 20),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
           ),
         ],
       ),

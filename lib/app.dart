@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:steet/presentation/home/pages/home_page.dart';
-import 'package:steet/presentation/profile/pages/profile_page.dart';
 import 'package:steet/presentation/rooms/pages/welcome_page.dart';
 import 'package:steet/presentation/screens/mobile_scafold.dart';
 

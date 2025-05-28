@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:steet/domain/entities/student.dart';
 import 'package:steet/domain/repositories/student_repository.dart';
 import 'package:steet/data/data_sources/student_data_source.dart';
@@ -33,6 +35,14 @@ class StudentRepositoryImp implements StudentRepository {
     }
   }
 
+  @override
+  Future<String> uploadProfileImage(String studentId, Uint8List fileBytes) async {
+    try {
+      return await dataSource.uploadProfileImage(studentId, fileBytes);
+    } catch (e) {
+      throw Exception('Failed to upload profile image: $e');
+    }
+  }
   // @override
   // Future<Student?> getStudentByEmail(String email) async {
   //   try {

@@ -26,17 +26,12 @@ class DioService {
       throw Exception('Unexpected error: $e');
     }
   }
-  
-  Future<Map<String, dynamic>> post(String endpoint, {dynamic data}) async {
+    Future<dynamic> post(String endpoint, {dynamic data}) async {
     try {
       final response = await _dio.post(endpoint, data: data);
       
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception('Server returned status code ${response.statusCode}');
-      }
-      
-      if (response.data is! Map<String, dynamic>) {
-        throw Exception('Expected JSON object response, got ${response.data.runtimeType}');
       }
       
       return response.data;

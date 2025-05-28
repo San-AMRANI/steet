@@ -19,6 +19,14 @@ class ApiEndpoints {
   /// GET: Retrieve a student by their username
   /// Path param: userName - Username of the student
   
+  static const String uploadProfileImage = '/api/students/upload-profile-image';
+  /// POST: Upload a profile image for a student.
+  /// Params: studentId (form field, UUID), file (form field, image file)
+
+  static const String getProfileImage = '/api/students/profile-image/{fileName}';
+  /// GET: Retrieve a profile image by its file name.
+  /// Params: fileName (path variable)
+
   static const String createUpdateStudent = '/api/students';
   /// POST: Create a new student
   /// Body: Student object

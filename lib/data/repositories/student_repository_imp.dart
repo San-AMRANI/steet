@@ -1,9 +1,9 @@
 import 'package:steet/domain/entities/student.dart';
 import 'package:steet/domain/repositories/student_repository.dart';
-import 'package:steet/data/data_sources/mock_student_data_source.dart';
+import 'package:steet/data/data_sources/student_data_source.dart';
 
 class StudentRepositoryImp implements StudentRepository {
-  final MockStudentDataSource dataSource;
+  final StudentDataSource dataSource;
 
   StudentRepositoryImp({required this.dataSource});
 

@@ -6,7 +6,12 @@ abstract class PrvRoomRepository {
     required String description,
     required bool isVisible,
     required String createdBy,
-    required List<String> memberships,
     required String imagePath,
+  });
+
+  Future<bool> sendInvitation({
+    required String roomId,
+    required String invitedStudentId,
+    required String inviterId,
   });
 }

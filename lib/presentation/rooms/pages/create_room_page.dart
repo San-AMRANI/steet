@@ -54,13 +54,14 @@ class _CreateRoomPageState extends ConsumerState<CreateRoomPage> {
       );
       return;
     }
-    ref.read(createPrvRoomProvider.notifier).createRoom(
+    ref.read(createPrvRoomProvider.notifier).createRoomAndSendInvitations(
           name: nameController.text,
           description: descriptionController.text,
           isVisible: isVisible,
-          createdBy: 'current_user_id', // Replace with actual user ID from auth
-          memberships: selectedMembers.map((s) => s.id).toList(),
+          createdBy:
+              'c8d6618f-0b4c-4897-bb99-45d93d304f41', // Replace with actual user ID
           imagePath: _imageFile!.path,
+          invitedMembers: selectedMembers.map((s) => s.id).toList(),
         );
   }
 

@@ -1,9 +1,9 @@
 import 'package:steet/domain/entities/student.dart';
 import 'package:steet/domain/repositories/student_repository.dart';
-import 'package:steet/data/data_sources/student_data_source.dart';
+import 'package:steet/data/data_sources/mock_student_data_source.dart';
 
 class StudentRepositoryImp implements StudentRepository {
-  final StudentDataSource dataSource;
+  final MockStudentDataSource dataSource;
 
   StudentRepositoryImp({required this.dataSource});
 
@@ -30,6 +30,16 @@ class StudentRepositoryImp implements StudentRepository {
       return studentModel.toEntity();
     } catch (e) {
       return null;
+    }
+  }
+
+  @override
+  Future<List<Student>> searchStudents(String query) async {
+    try {
+      final studentModels = await dataSource.searchStudents(query);
+      return studentModels.map((model) => model.toEntity()).toList();
+    } catch (e) {
+      return [];
     }
   }
 

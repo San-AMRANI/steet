@@ -4,19 +4,22 @@ import 'package:steet/data/models/student_model.dart';
 
 class StudentDataSource {
   final DioService _dioService = DioService();
-  
+
   StudentDataSource() {
     // _dioService.addInterceptors(); // Add logging and other interceptors
   }
-  
+
   Future<List<StudentModel>> getStudents() async {
     final data = await _dioService.get(ApiEndpoints.students);
     final List<dynamic> studentsData = data['data'] as List<dynamic>;
-    return studentsData.map((student) => StudentModel.fromJson(student)).toList();
+    return studentsData
+        .map((student) => StudentModel.fromJson(student))
+        .toList();
   }
 
   Future<StudentModel> getStudentById(String id) async {
-    final data = await _dioService.get(ApiEndpoints.studentById.replaceFirst('{id}', id));
+    final data = await _dioService
+        .get(ApiEndpoints.studentById.replaceFirst('{id}', id));
     return StudentModel.fromJson(data);
   }
 
@@ -25,8 +28,24 @@ class StudentDataSource {
       ApiEndpoints.createUpdateStudent,
       data: student.toJson(),
     );
-    
+
     return StudentModel.fromJson(data);
+  }
+
+  Future<List<StudentModel>> searchStudents(String query) async {
+    try {
+      final response = await _dioService.get(
+        '${ApiEndpoints.students}/search',
+        queryParameters: {
+          'q': query,
+        },
+      );
+
+      final List<dynamic> studentsData = response['data'] as List<dynamic>;
+      return studentsData.map((json) => StudentModel.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Failed to search students: $e');
+    }
   }
   // Rest of implementation...
 }

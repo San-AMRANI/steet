@@ -1,6 +1,6 @@
 import '../../domain/entities/student.dart';
 
-class StudentModel{
+class StudentModel {
   final String id;
   final String firstName;
   final String lastName;
@@ -8,7 +8,8 @@ class StudentModel{
   final String email;
   final DateTime dob;
   final String major;
-  
+  final String? imageUrl;
+
   StudentModel({
     required this.id,
     required this.firstName,
@@ -17,6 +18,7 @@ class StudentModel{
     required this.email,
     required this.dob,
     required this.major,
+    this.imageUrl,
   });
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
@@ -28,10 +30,10 @@ class StudentModel{
       email: json['email'] as String,
       dob: DateTime.parse(json['dob'] as String),
       major: json['major'] as String,
+      imageUrl: json['imageUrl'] as String?,
     );
   }
 
-  
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -41,6 +43,7 @@ class StudentModel{
       'email': email,
       'dob': dob.toIso8601String(),
       'major': major,
+      if (imageUrl != null) 'imageUrl': imageUrl,
     };
   }
 
@@ -53,12 +56,12 @@ class StudentModel{
       email: email,
       dob: dob,
       major: major,
+      imageUrl: imageUrl,
     );
   }
 
-
   @override
   String toString() {
-    return 'StudentModel{id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, email: $email, dob: $dob, major: $major}';
+    return 'StudentModel{id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, email: $email, dob: $dob, major: $major, imageUrl: $imageUrl}';
   }
 }

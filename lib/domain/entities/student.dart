@@ -1,4 +1,3 @@
-
 import 'package:steet/data/models/student_model.dart';
 
 class Student {
@@ -9,6 +8,9 @@ class Student {
   final String email;
   final DateTime dob;
   final String major;
+  final String? imageUrl;
+
+  String get fullName => '$firstName $lastName';
 
   Student({
     required this.id,
@@ -18,6 +20,7 @@ class Student {
     required this.email,
     required this.dob,
     required this.major,
+    this.imageUrl,
   });
 
   factory Student.fromJson(Map<String, dynamic> json) {
@@ -29,6 +32,7 @@ class Student {
       email: json['email'] as String,
       dob: DateTime.parse(json['dob'] as String),
       major: json['major'] as String,
+      imageUrl: json['imageUrl'] as String?,
     );
   }
 
@@ -41,10 +45,9 @@ class Student {
       'email': email,
       'dob': dob,
       'major': major,
+      if (imageUrl != null) 'imageUrl': imageUrl,
     };
   }
-
-  
 
   StudentModel toModel() {
     return StudentModel(
@@ -55,11 +58,21 @@ class Student {
       email: email,
       dob: dob,
       major: major,
+      imageUrl: imageUrl,
     );
   }
 
   @override
   String toString() {
-    return 'Student{id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, email: $email, dob: $dob, major: $major}';
+    return 'Student{id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, email: $email, dob: $dob, major: $major, imageUrl: $imageUrl}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Student && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

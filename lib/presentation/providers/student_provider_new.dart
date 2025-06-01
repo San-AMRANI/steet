@@ -1,10 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:steet/data/data_sources/student_data_source.dart';
-
 import 'package:steet/data/repositories/student_repository_imp.dart';
 import 'package:steet/domain/entities/student.dart';
 
-// TODO: Switch to real data source in production
+// Use real data source in production
 final _dataSource = StudentDataSource();
 final _repository = StudentRepositoryImp(dataSource: _dataSource);
 
@@ -31,35 +30,84 @@ final studentSearchProvider =
 
 class StudentSearchNotifier extends StateNotifier<AsyncValue<List<Student>>> {
   final StudentRepositoryImp _repository;
+  List<Student>? _cachedStudents;
 
   StudentSearchNotifier(this._repository) : super(const AsyncValue.data([]));
 
   void clearResults() {
     state = const AsyncValue.data([]);
+    _cachedStudents = null;
+  }
+
+  Future<void> _fetchAndCacheStudents() async {
+    if (_cachedStudents != null) return;
+
+    try {
+      print('Provider: Fetching all students for cache');
+      _cachedStudents = await _repository.getStudents();
+      print('Provider: Cached ${_cachedStudents?.length} students');
+    } catch (e, stack) {
+      print('Provider: Failed to fetch students: $e');
+      throw Exception('Failed to fetch students: $e');
+    }
   }
 
   Future<void> searchStudents(String query) async {
-    print('Provider: received search query: "$query"'); // Debug print
+    print('Provider: received search query: "$query"');
 
     if (query.isEmpty) {
-      print('Provider: empty query, returning empty list'); // Debug print
+      print('Provider: empty query, returning empty list');
       state = const AsyncValue.data([]);
       return;
     }
 
     try {
-      print('Provider: searching for "$query"'); // Debug print
       state = const AsyncValue.loading();
-      final students = await _repository.searchStudents(query);
-      print('Provider: found ${students.length} results'); // Debug print
+
+      // Fetch students if not cached
+      if (_cachedStudents == null) {
+        await _fetchAndCacheStudents();
+      }
+
+      if (_cachedStudents == null) {
+        throw Exception('Failed to load students');
+      }
+
+      // Perform client-side search
+      final lowercaseQuery = query.toLowerCase();
+      final results = _cachedStudents!.where((student) {
+        final fullName = '${student.firstName} ${student.lastName}'.toLowerCase();
+        final email = student.email.toLowerCase();
+        final userName = student.userName.toLowerCase();
+
+        return fullName.contains(lowercaseQuery) ||
+            email.contains(lowercaseQuery) ||
+            userName.contains(lowercaseQuery) ||
+            student.firstName.toLowerCase().contains(lowercaseQuery) ||
+            student.lastName.toLowerCase().contains(lowercaseQuery);
+      }).toList();
+
+      print('Provider: found ${results.length} results for query: "$query"');
+
       if (!mounted) {
-        print('Provider: not mounted, skipping update'); // Debug print
+        print('Provider: not mounted, skipping update');
         return;
       }
-      state = AsyncValue.data(students);
+
+      state = AsyncValue.data(results);
     } catch (e, stack) {
-      print('Provider: search failed with error: $e'); // Debug print
+      print('Provider: search failed with error: $e');
       state = AsyncValue.error(e, stack);
+    }
+  }
+
+  // Method to force refresh the cache
+  Future<void> refreshCache() async {
+    _cachedStudents = null;
+    if (state.value?.isNotEmpty == true) {
+      // If we were showing results, refresh them
+      final currentQuery = state.value?.isNotEmpty == true ? 'current_query' : '';
+      await searchStudents(currentQuery);
     }
   }
 }

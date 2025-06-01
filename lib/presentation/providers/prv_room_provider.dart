@@ -1,47 +1,52 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:steet/data/data_sources/prv_rooms_data_source.dart';
-import 'package:steet/data/data_sources/pub_rooms_data_source.dart';
-import 'package:steet/data/models/prv_room_model.dart';
 import 'package:steet/data/repositories/prv_room_repository_imp.dart';
-import 'package:steet/data/repositories/pub_room_repository_imp.dart';
+import 'package:steet/domain/repositories/prv_room_repository.dart';
 import 'package:steet/domain/usecases/create_prv_room_usecase.dart';
-import 'package:steet/domain/entities/room.dart';
-import 'package:steet/domain/entities/prv_room.dart';
-import 'package:steet/domain/entities/pub_room.dart';
+import 'package:steet/domain/usecases/send_invitation_usecase.dart';
+import 'package:steet/data/models/prv_room_model.dart';
 
 // Dependencies for private rooms
 final _prvDataSource = PrvRoomsDataSource();
-final _prvRepository = PrvRoomRepositoryImpl(_prvDataSource);
+final PrvRoomRepository _prvRepository = PrvRoomRepositoryImpl(_prvDataSource);
 final _createPrvRoomUseCase = CreatePrvRoomUseCase(_prvRepository);
+final _sendInvitationUseCase = SendInvitationUseCase(_prvRepository);
 
-// Dependencies for public rooms
-final _pubDataSource = PubRoomsDataSource();
-final _pubRepository = PubRoomRepositoryImpl(_pubDataSource);
-
-// State notifier for private room creation
 class CreatePrvRoomNotifier extends StateNotifier<AsyncValue<PrvRoomModel?>> {
-  final CreatePrvRoomUseCase _useCase;
+  final CreatePrvRoomUseCase _createRoomUseCase;
+  final SendInvitationUseCase _sendInvitationUseCase;
 
-  CreatePrvRoomNotifier(this._useCase) : super(const AsyncValue.data(null));
+  CreatePrvRoomNotifier(this._createRoomUseCase, this._sendInvitationUseCase)
+      : super(const AsyncValue.data(null));
 
-  Future<void> createRoom({
+  Future<void> createRoomAndSendInvitations({
     required String name,
     required String description,
     required bool isVisible,
     required String createdBy,
-    required List<String> memberships,
     required String imagePath,
+    required List<String> invitedMembers,
   }) async {
     state = const AsyncValue.loading();
     try {
-      final room = await _useCase.execute(
+      // First create the room
+      final room = await _createRoomUseCase.execute(
         name: name,
         description: description,
         isVisible: isVisible,
         createdBy: createdBy,
-        memberships: memberships,
         imagePath: imagePath,
       );
+
+      // Then send invitations to all members
+      for (final memberId in invitedMembers) {
+        await _sendInvitationUseCase.execute(
+          roomId: room.id,
+          invitedStudentId: memberId,
+          inviterId: createdBy,
+        );
+      }
+
       state = AsyncValue.data(room);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
@@ -49,12 +54,14 @@ class CreatePrvRoomNotifier extends StateNotifier<AsyncValue<PrvRoomModel?>> {
   }
 }
 
-// Provider for private room creation
+// Provider
 final createPrvRoomProvider =
     StateNotifierProvider<CreatePrvRoomNotifier, AsyncValue<PrvRoomModel?>>(
-        (ref) {
-  return CreatePrvRoomNotifier(_createPrvRoomUseCase);
-});
+  (ref) => CreatePrvRoomNotifier(
+    _createPrvRoomUseCase,
+    _sendInvitationUseCase,
+  ),
+);
 
 // Parameters class for creating private rooms
 class CreatePrvRoomParams {

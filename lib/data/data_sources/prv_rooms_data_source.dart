@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:steet/core/constants/api_endpoints.dart';
 import 'package:steet/core/utils/dio_service.dart';
 import 'package:steet/data/models/prv_room_model.dart';
@@ -16,7 +18,6 @@ class PrvRoomsDataSource {
     required String description,
     required bool isVisible,
     required String createdBy,
-    required List<String> memberships,
     required String imagePath,
   }) async {
     try {
@@ -26,24 +27,88 @@ class PrvRoomsDataSource {
         throw Exception('File does not exist: $imagePath');
       }
 
-      // Create form data with both image and room data
-      final formData = FormData.fromMap({
-        'image': await MultipartFile.fromFile(imagePath),
+      // Read file as bytes
+      final Uint8List imageBytes = await file.readAsBytes();
+
+      // Create the room data
+      final roomData = {
         'name': name,
         'description': description,
-        'isVisible': isVisible.toString(),
+        'visible': isVisible,
         'createdBy': createdBy,
-        'memberships': jsonEncode(memberships),
+      };
+
+      // Create form data with room JSON and image file
+      final formData = FormData.fromMap({
+        'prvRoom': MultipartFile.fromString(
+          jsonEncode(roomData),
+          contentType: MediaType.parse('application/json'),
+        ),
+        'imageFile': MultipartFile.fromBytes(
+          imageBytes,
+          filename: 'room_image.jpg',
+          contentType: MediaType.parse('image/jpeg'),
+        ),
       });
 
+      print('Creating private room with data: $roomData'); // Debug log
+
       final response = await _dioService.post(
-        ApiEndpoints.createPrivateRoom,
+        ApiEndpoints.createStudentPrivateRoom,
         data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+          headers: {
+            'Accept': 'application/json',
+          },
+        ),
       );
 
-      return PrvRoomModel.fromJson(response);
-    } catch (e) {
+      if (response is Map<String, dynamic>) {
+        if (response.containsKey('data')) {
+          return PrvRoomModel.fromJson(response['data']);
+        }
+        return PrvRoomModel.fromJson(response);
+      }
+
+      throw Exception('Unexpected response format');
+    } catch (e, stackTrace) {
+      print('Error creating private room: $e');
+      print('Stack trace: $stackTrace');
       throw Exception('Failed to create private room: $e');
+    }
+  }
+
+  // Add new method for sending invitations
+  Future<bool> sendInvitation({
+    required String roomId,
+    required String invitedStudentId,
+    required String inviterId,
+  }) async {
+    try {
+      final response = await _dioService.post(
+        ApiEndpoints.sendInvitation,
+        queryParameters: {
+          'roomId': roomId,
+          'invitedStudentId': invitedStudentId,
+          'inviterId': inviterId,
+        },
+      );
+
+      // Handle boolean response
+      if (response is bool) {
+        return response;
+      }
+      
+      // If response is a Map, try to get boolean value
+      if (response is Map<String, dynamic>) {
+        return response['data'] ?? false;
+      }
+
+      return false;
+    } catch (e) {
+      print('Error sending invitation: $e');
+      throw Exception('Failed to send invitation: $e');
     }
   }
 }

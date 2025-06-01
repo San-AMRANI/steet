@@ -12,15 +12,10 @@ class StudentDataSource {
     // _dioService.addInterceptors(); // Add logging and other interceptors
   }
 
-  Future<List<StudentModel>> getStudents() async {
-    final data = await _dioService.get(ApiEndpoints.students);
-    final List<dynamic> studentsData = data['data'] as List<dynamic>;
-    return studentsData
-        
-        .map((student) => StudentModel.fromJson(student))
-        
-        .toList();
-  }
+ Future<List<StudentModel>> getStudents() async {
+  final List<dynamic> studentsData = await _dioService.get(ApiEndpoints.students);
+  return studentsData.map((student) => StudentModel.fromJson(student)).toList();
+}
 
   Future<StudentModel> getStudentById(String id) async {
     try {

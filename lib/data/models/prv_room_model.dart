@@ -21,18 +21,20 @@ class PrvRoomModel extends RoomModel {
       id: json['id'],
       name: json['name'],
       description: json['description'],
-      createdAt: DateTime.parse(json['createdAt']),
-      isVisible: json['isVisible'],
-      createdBy: json['createdBy'],
-      memberships: List<String>.from(json['memberships']),
       imageUrl: json['imageUrl'],
+      createdAt: DateTime.parse(json['createdAt']),
+      isVisible: json['visible'] ?? false,
+      createdBy: json['createdBy'],
+      memberships: json['memberships'] != null 
+          ? List<String>.from(json['memberships'])
+          : [],
     );
   }
 
   @override
   Map<String, dynamic> toJson() {
     final json = super.toJson();
-    json['isVisible'] = isVisible;
+    json['visible'] = isVisible;
     json['createdBy'] = createdBy;
     json['memberships'] = memberships;
     json['imageUrl'] = imageUrl;

@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:steet/core/utils/secure_storage_service.dart';
+import 'package:http_parser/http_parser.dart';
+import 'dart:convert';
 
 class DioService {
   late final Dio _dio;
@@ -62,16 +64,44 @@ class DioService {
     }
   }
 
-  Future<dynamic> post(String endpoint, {dynamic data}) async {
+  Future<dynamic> post(
+    String endpoint, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     try {
-      final response = await _dio.post(endpoint, data: data);
+      print('Making POST request to: $endpoint'); // Debug log
+      
+      // Log form data contents if present
+      if (data is FormData) {
+        print('Form data fields: ${data.fields}'); // Debug log
+        print('Form data files: ${data.files}'); // Debug log
+      }
+
+      final response = await _dio.post(
+        endpoint,
+        data: data,
+        queryParameters: queryParameters,
+        options: options ?? Options(
+          validateStatus: (status) {
+            return status! < 500;
+          },
+        ),
+      );
+
+      print('Response status: ${response.statusCode}'); // Debug log
+      print('Response data: ${response.data}'); // Debug log
 
       if (response.statusCode != 200 && response.statusCode != 201) {
         throw Exception('Server returned status code ${response.statusCode}');
       }
 
+      // Return the response data as is, without type checking
       return response.data;
     } on DioException catch (e) {
+      print('DioException: ${e.message}'); // Debug log
+      print('DioException response: ${e.response?.data}'); // Debug log
       throw _handleError(e);
     }
   }
@@ -95,51 +125,12 @@ class DioService {
     }
   }
 
-  Future<String> uploadFile({
-    required String endpoint,
-    required String filePath,
-    String fileField = 'file',
-    Map<String, dynamic>? additionalFields,
-  }) async {
-    try {
-      final formData = FormData.fromMap({
-        fileField: await MultipartFile.fromFile(filePath),
-        if (additionalFields != null) ...additionalFields,
-      });
-
-      final response = await _dio.post(
-        endpoint,
-        data: formData,
-        options: Options(
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        ),
-      );
-
-      if (response.statusCode != 200 && response.statusCode != 201) {
-        throw Exception('Failed to upload file: ${response.statusCode}');
-      }
-
-      if (response.data is! Map<String, dynamic>) {
-        throw Exception('Invalid response format');
-      }
-
-      // Assuming the API returns the file URL in a field called 'url'
-      final url = response.data['url'] as String?;
-      if (url == null) {
-        throw Exception('No file URL in response');
-      }
-
-      return url;
-    } on DioException catch (e) {
-      throw _handleError(e);
-    } catch (e) {
-      throw Exception('Failed to upload file: $e');
-    }
-  }
 
   Exception _handleError(DioException e) {
+    print('DioException type: ${e.type}'); // Debug log
+    print('DioException message: ${e.message}'); // Debug log
+    print('DioException response data: ${e.response?.data}'); // Debug log
+    
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
@@ -147,7 +138,7 @@ class DioService {
         return Exception('Connection timed out');
       case DioExceptionType.badResponse:
         return Exception(
-            'Server error: ${e.response?.statusCode} - ${e.response?.statusMessage}');
+            'Server error: ${e.response?.statusCode} - ${e.response?.statusMessage}\nResponse data: ${e.response?.data}');
       case DioExceptionType.cancel:
         return Exception('Request was cancelled');
       case DioExceptionType.badCertificate:

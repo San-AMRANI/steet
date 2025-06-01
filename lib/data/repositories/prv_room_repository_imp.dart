@@ -7,12 +7,12 @@ class PrvRoomRepositoryImpl implements PrvRoomRepository {
   final PrvRoomsDataSource _dataSource;
   PrvRoomRepositoryImpl(this._dataSource);
 
+  @override
   Future<PrvRoomModel> createPrvRoom({
     required String name,
     required String description,
     required bool isVisible,
     required String createdBy,
-    required List<String> memberships,
     required String imagePath,
   }) async {
     return await _dataSource.createPrvRoom(
@@ -20,8 +20,20 @@ class PrvRoomRepositoryImpl implements PrvRoomRepository {
       description: description,
       isVisible: isVisible,
       createdBy: createdBy,
-      memberships: memberships,
       imagePath: imagePath,
+    );
+  }
+
+  @override
+  Future<bool> sendInvitation({
+    required String roomId,
+    required String invitedStudentId,
+    required String inviterId,
+  }) async {
+    return await _dataSource.sendInvitation(
+      roomId: roomId,
+      invitedStudentId: invitedStudentId,
+      inviterId: inviterId,
     );
   }
 }

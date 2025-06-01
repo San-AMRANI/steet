@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:steet/presentation/profile/pages/profile_page.dart';
 import 'package:steet/presentation/home/pages/home_page.dart';
+import 'package:steet/presentation/rooms/pages/rooms_page.dart';
 
 class MobileScafold extends StatefulWidget {
   const MobileScafold({super.key});
@@ -15,7 +16,7 @@ class _MobileScafoldState extends State<MobileScafold> {
 
   final List<Widget> _pages = [
     HomePage(),
-    Center(child: Text('Create Page')), // Replace with your actual Create page widget if needed
+    RoomsPage(),
     ProfilePage(),
   ];
 
@@ -25,7 +26,7 @@ class _MobileScafoldState extends State<MobileScafold> {
     });
     // Removed Navigator.pushReplacementNamed to fix navigation
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,9 +40,7 @@ class _MobileScafoldState extends State<MobileScafold> {
         actions: [
           IconButton(
             icon: const Icon(CupertinoIcons.bell),
-            onPressed: () {
-              
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -58,8 +57,8 @@ class _MobileScafoldState extends State<MobileScafold> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.plus_app),
-            label: 'Create',
+            icon: Icon(CupertinoIcons.rectangle_stack_person_crop),
+            label: 'Rooms',
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.person),

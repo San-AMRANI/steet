@@ -1,7 +1,7 @@
 import 'room.dart';
 
 class PrvRoom extends Room {
-  final bool isPrivate;
+  final bool isVisible;
   final String createdBy;
   final List<String> memberships;
 
@@ -11,7 +11,7 @@ class PrvRoom extends Room {
     required super.description,
     required super.imageUrl,
     required super.createdAt,
-    required this.isPrivate,
+    required this.isVisible,
     required this.createdBy,
     required this.memberships,
   });
@@ -22,7 +22,7 @@ class PrvRoom extends Room {
       name: json['name'] as String,
       description: json['description'] as String,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      isPrivate: json['isPrivate'] as bool,
+      isVisible: json['isVisible'] as bool,
       createdBy: json['createdBy'] as String,
       memberships: List<String>.from(json['memberships']),
       imageUrl: json['imageUrl'] as String,
@@ -32,7 +32,7 @@ class PrvRoom extends Room {
   @override
   Map<String, dynamic> toJson() {
     final json = super.toJson();
-    json['isPrivate'] = isPrivate;
+    json['isVisible'] = isVisible;
     json['createdBy'] = createdBy;
     json['memberships'] = memberships;
     json['imageUrl'] = imageUrl;

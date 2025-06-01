@@ -6,7 +6,6 @@ import 'package:steet/data/data_sources/student_data_source.dart';
 
 class StudentRepositoryImp implements StudentRepository {
   final StudentDataSource dataSource;
-
   StudentRepositoryImp({required this.dataSource});
 
   @override
@@ -32,6 +31,16 @@ class StudentRepositoryImp implements StudentRepository {
       return studentModel.toEntity();
     } catch (e) {
       return null;
+    }
+  }
+
+  @override
+  Future<List<Student>> searchStudents(String query) async {
+    try {
+      final studentModels = await dataSource.searchStudents(query);
+      return studentModels.map((model) => model.toEntity()).toList();
+    } catch (e) {
+      return [];
     }
   }
 

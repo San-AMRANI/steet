@@ -1,4 +1,3 @@
-
 import 'package:steet/data/models/student_model.dart';
 
 class Student {
@@ -66,11 +65,8 @@ class Student {
       'email': email,
       'dob': dob,
       'major': major,
-      'profilePictureUrl': profilePictureUrl,
     };
   }
-
-  
 
   StudentModel toModel() {
     return StudentModel(
@@ -82,6 +78,7 @@ class Student {
       email: email,
       dob: dob,
       major: major,
+      
     );
   }
 
@@ -89,4 +86,15 @@ class Student {
   String toString() {
     return 'Student{id: $id, firstName: $firstName, lastName: $lastName, userName: $userName, email: $email, dob: $dob, major: $major, profilePictureUrl: $profilePictureUrl}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Student && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  String get fullName => '$firstName $lastName';
 }

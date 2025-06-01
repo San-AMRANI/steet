@@ -2,7 +2,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import '../../domain/entities/student.dart';
 
-class StudentModel{
+class StudentModel {
   final String id;
   final String firstName;
   final String lastName;
@@ -42,7 +42,6 @@ class StudentModel{
     );
   }
 
-  
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -68,7 +67,6 @@ class StudentModel{
       profilePictureUrl: profilePictureUrl,
     );
   }
-
 
   @override
   String toString() {

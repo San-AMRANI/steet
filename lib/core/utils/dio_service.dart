@@ -95,6 +95,50 @@ class DioService {
     }
   }
 
+  Future<String> uploadFile({
+    required String endpoint,
+    required String filePath,
+    String fileField = 'file',
+    Map<String, dynamic>? additionalFields,
+  }) async {
+    try {
+      final formData = FormData.fromMap({
+        fileField: await MultipartFile.fromFile(filePath),
+        if (additionalFields != null) ...additionalFields,
+      });
+
+      final response = await _dio.post(
+        endpoint,
+        data: formData,
+        options: Options(
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('Failed to upload file: ${response.statusCode}');
+      }
+
+      if (response.data is! Map<String, dynamic>) {
+        throw Exception('Invalid response format');
+      }
+
+      // Assuming the API returns the file URL in a field called 'url'
+      final url = response.data['url'] as String?;
+      if (url == null) {
+        throw Exception('No file URL in response');
+      }
+
+      return url;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    } catch (e) {
+      throw Exception('Failed to upload file: $e');
+    }
+  }
+
   Exception _handleError(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
@@ -106,13 +150,15 @@ class DioService {
             'Server error: ${e.response?.statusCode} - ${e.response?.statusMessage}');
       case DioExceptionType.cancel:
         return Exception('Request was cancelled');
+      case DioExceptionType.badCertificate:
+        return Exception('Invalid certificate');
+      case DioExceptionType.connectionError:
+        return Exception('Connection error');
       case DioExceptionType.unknown:
         if (e.error != null && e.error.toString().contains('SocketException')) {
           return Exception('No internet connection');
         }
         return Exception('Unknown error: ${e.error}');
-      default:
-        return Exception('Network error occurred');
     }
   }
 }

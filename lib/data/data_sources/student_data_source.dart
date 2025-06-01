@@ -16,14 +16,17 @@ class StudentDataSource {
     final data = await _dioService.get(ApiEndpoints.students);
     final List<dynamic> studentsData = data['data'] as List<dynamic>;
     return studentsData
+        
         .map((student) => StudentModel.fromJson(student))
+        
         .toList();
   }
 
   Future<StudentModel> getStudentById(String id) async {
     try {
       final data = await _dioService
-          .get(ApiEndpoints.studentById.replaceFirst('{id}', id));
+          
+        .get(ApiEndpoints.studentById.replaceFirst('{id}', id));
 
       // Check if the response has a 'data' field (common API pattern)
       if (data is Map<String, dynamic> && data.containsKey('data')) {
@@ -44,7 +47,24 @@ class StudentDataSource {
       data: student.toJson(),
     );
 
+
     return StudentModel.fromJson(data);
+  }
+
+  Future<List<StudentModel>> searchStudents(String query) async {
+    try {
+      final response = await _dioService.get(
+        '${ApiEndpoints.students}/search',
+        queryParameters: {
+          'q': query,
+        },
+      );
+
+      final List<dynamic> studentsData = response['data'] as List<dynamic>;
+      return studentsData.map((json) => StudentModel.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Failed to search students: $e');
+    }
   }
 
   Future<String> uploadProfileImage(

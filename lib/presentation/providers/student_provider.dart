@@ -4,44 +4,14 @@ import 'package:steet/data/data_sources/student_data_source.dart';
 import 'package:steet/data/models/student_model.dart';
 import 'package:steet/data/repositories/student_repository_imp.dart';
 import 'package:steet/domain/entities/student.dart';
-
-// Create a state class to represent the student data state
-class StudentState {
-  final Student? student;
-  final List<Student> students;
-  final bool isLoading;
-  final String? error;
-
-  const StudentState({
-    this.student,
-    this.students = const [],
-    this.isLoading = false,
-    this.error,
-  });
-
-  StudentState copyWith({
-    Student? student,
-    List<Student>? students,
-    bool? isLoading,
-    String? error,
-  }) {
-    return StudentState(
-      student: student ?? this.student,
-      students: students ?? this.students,
-      isLoading: isLoading ?? this.isLoading,
-      error: error ?? this.error,
-    );
-  }
-}
+import 'package:steet/presentation/providers/states/student_state.dart';
 
 // Create a notifier class to handle student operations
-class StudentNotifier extends Notifier<StudentState> {
+class StudentNotifier extends StateNotifier<StudentState> {
   late final StudentRepositoryImp _repository;
 
-  @override
-  StudentState build() {
+  StudentNotifier() : super(const StudentState()) {
     _repository = StudentRepositoryImp(dataSource: StudentDataSource());
-    return const StudentState();
   }
 
   // Get a student by ID
@@ -76,6 +46,7 @@ class StudentNotifier extends Notifier<StudentState> {
       state = state.copyWith(error: e.toString(), isLoading: false);
     }
   }
+  
   // Upload a profile image
   Future<String?> uploadProfileImage(String studentId, Uint8List imageBytes) async {
     state = state.copyWith(isLoading: true, error: null);
@@ -102,7 +73,7 @@ class StudentNotifier extends Notifier<StudentState> {
 }
 
 // Create the provider
-final studentNotifierProvider = NotifierProvider<StudentNotifier, StudentState>(() {
+final studentNotifierProvider = StateNotifierProvider<StudentNotifier, StudentState>((ref) {
   return StudentNotifier();
 });
 

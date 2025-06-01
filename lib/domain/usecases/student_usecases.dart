@@ -10,4 +10,15 @@ class GetStudents{
   Future<List<Student>> execute() async {
     return await studentRepository.getStudents();
   }
+  
+}
+
+class GetStudentById {
+  final StudentRepository studentRepository;
+
+  GetStudentById({required this.studentRepository});
+
+  Future<Student?> execute(String id) async {
+    return await studentRepository.getStudentById(id);
+  }
 }

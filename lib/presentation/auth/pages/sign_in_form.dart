@@ -1,25 +1,53 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:steet/presentation/providers/auth_provider.dart';
 import 'package:steet/presentation/widgets/my_text_field.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class SignInForm extends ConsumerStatefulWidget {
+  const SignInForm({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  ConsumerState<SignInForm> createState() => _SignInFormState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInFormState extends ConsumerState<SignInForm> {
   final passwordController = TextEditingController();
-  final emailController = TextEditingController();
+  final emailOrUsernameController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   bool signInRequired = false;
   IconData? passwordIcon = CupertinoIcons.eye_slash_fill;
   bool obscurePassword = true;
-  String? _errorMessage;
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    emailOrUsernameController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Reset the sign-in required state when the form is initialized
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+    ref.read(authProvider.notifier).resetResponseStatus();
+  });
+    
+  }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authProvider);
+    
+
+    // When authentication is successful, navigate to home screen
+    if (authState.isAuthenticated) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/mobile');
+      });
+    }
+
     return Form(
       key: _formKey,
       child: Column(
@@ -28,25 +56,16 @@ class _SignInPageState extends State<SignInPage> {
           SizedBox(
             width: MediaQuery.of(context).size.width * 0.9,
             child: MyTextField(
-              labelText: 'Email',
-              hintText: 'Email',
-              controller: emailController,
+              labelText: 'Email or username',
+              hintText: 'email@example.com or username',
+              controller: emailOrUsernameController,
               obscureText: false,
               keyboardType: TextInputType.emailAddress,
               prefixIcon: CupertinoIcons.mail,
-              errorMsg: _errorMessage,
-              onChanged: (value) {
-                setState(() {
-                  _errorMessage = null;
-                });
-              },
+              errorMsg: authState.error,
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Please enter your email';
-                } else if (!RegExp(
-                        r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-                    .hasMatch(value)) {
-                  return 'Please enter a valid email address';
+                  return 'Please enter your email or username';
                 }
                 return null;
               },
@@ -70,50 +89,45 @@ class _SignInPageState extends State<SignInPage> {
                             : CupertinoIcons.eye;
                       }),
                   icon: Icon(passwordIcon)),
-              errorMsg: _errorMessage,
-              onChanged: (value) {
-                setState(() {
-                  _errorMessage = null;
-                });
-              },
+              errorMsg: authState.error,
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your password';
-                } else if (!RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$')
-                    .hasMatch(value)) {
-                  return 'Password must be at least 8 characters long and include both letters and numbers';
                 }
                 return null;
               },
             ),
           ),
           const SizedBox(height: 10),
-          !signInRequired
-              ? SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  child: TextButton(
-                    onPressed: () {
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.5,
+            child: TextButton(
+              onPressed: authState.isLoading
+                  ? null
+                  : () {
                       if (_formKey.currentState!.validate()) {
-                        // Perform sign-in action
-                        setState(() {
-                          signInRequired = true;
-                        });
-                      } else {
-                        setState(() {
-                          _errorMessage =
-                              'Please fill in all fields correctly.';
-                        });
+                        ref.read(authProvider.notifier).signIn(
+                            emailOrUsernameController.text,
+                            passwordController.text);
                       }
                     },
-                    style: TextButton.styleFrom(
-                      elevation: 3.0,
-                      backgroundColor: Theme.of(context).colorScheme.primary,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(60),
-                      ),
-                    ),
-                    child: const Padding(
+              style: TextButton.styleFrom(
+                elevation: 3.0,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(60),
+                ),
+              ),
+              child: authState.isLoading
+                  ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 3,
+                      ))
+                  : const Padding(
                       padding:
                           EdgeInsets.symmetric(horizontal: 25, vertical: 0),
                       child: Text(
@@ -122,13 +136,11 @@ class _SignInPageState extends State<SignInPage> {
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 16,
-                          // fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ),
-                )
-              : const CircularProgressIndicator(),
+            ),
+          ),
           const SizedBox(height: 10),
           GestureDetector(
             onTap: () {

@@ -11,9 +11,7 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pubRoomsAsync = ref.watch(pubRoomsProvider);
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: RefreshIndicator(
+    return RefreshIndicator(
         onRefresh: () async {
           // Refresh the data
           ref.invalidate(pubRoomsProvider);
@@ -30,8 +28,7 @@ class HomePage extends ConsumerWidget {
             return const Center(child: CircularProgressIndicator());
           },
         ),
-      ),
-    );
+      );
   }
 }
 

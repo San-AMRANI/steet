@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:steet/presentation/auth/pages/sign_in_page.dart';
-import 'package:steet/presentation/auth/pages/sign_up_page.dart';
+import 'package:steet/presentation/auth/pages/sign_in_form.dart';
+import 'package:steet/presentation/auth/pages/sign_up_form.dart';
 
 
 class WelcomePage extends StatefulWidget {
@@ -148,9 +148,9 @@ class _WelcomePageState extends State<WelcomePage>
                           child:
                               TabBarView(controller: tabController, children: [
                         // Sign In Page
-                        const SignInPage(),
+                        const SignInForm(),
                         // Sign Up Page
-                        const SignUpPages(),
+                        const SignUpForm(),
                       ])),
                     ],
                   ),

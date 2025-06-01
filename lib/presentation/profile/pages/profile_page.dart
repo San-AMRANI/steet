@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:steet/presentation/profile/pages/edit_profile_picture_page.dart';
 import 'package:steet/presentation/profile/pages/new_password_page.dart';
+import 'package:steet/presentation/providers/auth_provider.dart';
+import 'package:steet/presentation/widgets/auth_network_image.dart';
 import 'package:steet/presentation/widgets/my_text_icon_button.dart';
 import 'edit_profile_page.dart';
 import 'package:steet/presentation/providers/student_provider.dart';
@@ -15,46 +18,47 @@ class ProfilePage extends ConsumerStatefulWidget {
 }
 
 class _ProfilePageState extends ConsumerState<ProfilePage> {
-  final String _studentId = '62257c22-5825-4fb8-9839-3bd001ce2c06';
-  Object? _lastError;
-
   @override
   void initState() {
     super.initState();
-    // Fetch student data when the widget initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(studentNotifierProvider.notifier).getStudentById(_studentId);
+      // Get the userId from auth provider instead of using hardcoded value
+      final authState = ref.read(authProvider);
+      final userId = authState.userId;
+
+      if (userId != null) {
+        ref.read(studentNotifierProvider.notifier).getStudentById(userId);
+      } else {
+        // Handle case where user is not authenticated
+        sleep(const Duration(seconds: 2));
+        Navigator.pushReplacementNamed(
+          context,
+          '/welcome',
+        );
+        // Optionally redirect to login page
+      }
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final studentState = ref.watch(studentNotifierProvider);
     final student = studentState.student;
-    final isLoading = studentState.isLoading;
     final error = studentState.error;
-    
-  print('url profffile ${student?.profilePictureUrl}');
 
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-    
+    print('url profffile ${student?.profilePictureUrl}');
+
     if (error != null && student == null) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Error: $error'),
-            ElevatedButton(
-              onPressed: () {
-                ref.read(studentNotifierProvider.notifier).getStudentById(_studentId);
-              },
-              child: const Text('Retry'),
-            ),
-          ],
-        ),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Failed to load your data. Please check your internet connection.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      });
     }
     return SafeArea(
       child: Padding(
@@ -71,13 +75,10 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     child: ClipOval(
                       child: student == null
                           ? const Icon(Icons.person, size: 60)
-                          : CachedNetworkImage(
-                              imageUrl: student.profilePictureUrl ?? '',
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
-                              fit: BoxFit.cover,
+                          : AuthNetworkImage(
+                              imageUrl: student.profilePictureUrl,
+                              placeholder: const CircularProgressIndicator(),
+                              errorWidget: const Icon(CupertinoIcons.person_fill, color: Colors.black, size: 72),
                               width: 120,
                               height: 120,
                             ),
@@ -106,6 +107,7 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                         SnackBar(
                           content: Text(
                               'Failed to load your data. Please check your internet connection.'),
+                          backgroundColor: Colors.red,
                         ),
                       );
                     }
@@ -221,8 +223,12 @@ class _ProfilePageState extends ConsumerState<ProfilePage> {
                     text: 'Log Out',
                     prefixIcon: Icons.logout,
                     onPressed: () {
-                      // Handle log out action
-                      //! to be implemented
+                      // Handle log out action using auth provider
+                      ref.read(authProvider.notifier).signOut();
+                      Navigator.pop(context);
+                      // Navigate to login page or home
+                      Navigator.of(context).pushReplacementNamed(
+                          '/login'); // Adjust the route as needed
                     },
                     textStyle: TextStyle(color: Colors.white),
                     color: Colors.red,

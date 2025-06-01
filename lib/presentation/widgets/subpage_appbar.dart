@@ -1,5 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:steet/presentation/widgets/auth_network_image.dart';
 
 class SubPageAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -41,8 +42,10 @@ class SubPageAppBar extends StatelessWidget implements PreferredSizeWidget {
             radius: 20,
             backgroundColor: Colors.transparent,
             child: ClipOval(
-              child: CachedNetworkImage(
+              child: AuthNetworkImage(
                 imageUrl: avatarUrl,
+                placeholder: const CircularProgressIndicator(),
+                errorWidget: const Icon(CupertinoIcons.person_fill, color: Colors.black, size: 28),
                 fit: BoxFit.cover,
                 width: 40,
                 height: 40,

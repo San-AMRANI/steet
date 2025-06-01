@@ -36,7 +36,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   // Form key for validation
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  bool _controllersInitialized = false;
+  
   @override
   void dispose() {
     firstNameController.dispose();
@@ -148,7 +148,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           authStudent!.dob.toIso8601String().split('T').first; // Format date
       majorController.text = authStudent!.major;
     }
-    _controllersInitialized = true;
   }
 
   @override

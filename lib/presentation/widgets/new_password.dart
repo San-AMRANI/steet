@@ -2,37 +2,6 @@ import 'package:flutter/cupertino.dart' show CupertinoIcons;
 import 'package:flutter/material.dart';
 import 'my_text_field.dart';
 
-// the password creation may be used many times (while creating the account, changing the password, resetting it etc.)
-
-/* 
-  //? creating the account 
-  NewPasswordWidget(
-    passwordController: passwordController,
-    confirmPasswordController: confirmPasswordController,
-    formKey: formKey,
-    title: "Create a new password",
-  )
-
-  //? changing the password
-  NewPasswordWidget(
-    passwordController: newPasswordController,
-    confirmPasswordController: confirmPasswordController,
-    oldPasswordController: oldPasswordController,
-    formKey: formKey,
-    title: "Change your password",
-    showOldPassword: true,
-  )
-
-  //? resetting the password
-  NewPasswordWidget(
-    passwordController: resetPasswordController,
-    confirmPasswordController: confirmResetPasswordController,
-    formKey: formKey,
-    title: "Reset your password",
-  )
-
-*/
-
 class NewPasswordWidget extends StatefulWidget {
   final TextEditingController passwordController;
   final TextEditingController confirmPasswordController;
@@ -45,6 +14,14 @@ class NewPasswordWidget extends StatefulWidget {
   final String? passwordLabel;
   final String? confirmPasswordLabel;
 
+  // Static method for external validation
+  static bool isPasswordValid(String password) {
+    return password.length >= 8 &&
+           password.contains(RegExp(r'[0-9]')) &&
+           password.contains(RegExp(r'[A-Z]')) &&
+           password.contains(RegExp(r'[a-z]'));
+  }
+
   const NewPasswordWidget({
     super.key,
     required this.passwordController,
@@ -55,7 +32,6 @@ class NewPasswordWidget extends StatefulWidget {
     this.passwordLabel,
     this.confirmPasswordLabel,
   });
-
   @override
   State<NewPasswordWidget> createState() => _NewPasswordWidgetState();
 }
@@ -65,6 +41,7 @@ class _NewPasswordWidgetState extends State<NewPasswordWidget> {
   bool hasNumber = false;
   bool hasUppercase = false;
   bool hasLowercase = false;
+  bool passwordsMatch = false;
 
   void _validatePassword(String password) {
     setState(() {
@@ -73,6 +50,36 @@ class _NewPasswordWidgetState extends State<NewPasswordWidget> {
       hasUppercase = password.contains(RegExp(r'[A-Z]'));
       hasLowercase = password.contains(RegExp(r'[a-z]'));
     });
+    _validatePasswordConfirmation();
+  }
+
+  void _validatePasswordConfirmation() {
+    setState(() {
+      passwordsMatch = widget.passwordController.text == widget.confirmPasswordController.text &&
+          widget.confirmPasswordController.text.isNotEmpty;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize validation state
+    _validatePassword(widget.passwordController.text);
+    
+    // Listen to changes in both password fields
+    widget.passwordController.addListener(() {
+      _validatePassword(widget.passwordController.text);
+    });
+    
+    widget.confirmPasswordController.addListener(() {
+      _validatePasswordConfirmation();
+    });
+  }
+
+  @override
+  void dispose() {
+    // Don't dispose the controllers here, they're passed from parent
+    super.dispose();
   }
 
   @override
@@ -97,8 +104,20 @@ class _NewPasswordWidgetState extends State<NewPasswordWidget> {
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Please enter your password";
-            } else if (value.length < 8) {
+            } 
+            
+            // Check all password requirements in validator
+            if (!hasMinLength) {
               return "Password must be at least 8 characters long";
+            } 
+            if (!hasNumber) {
+              return "Password must contain at least one number";
+            } 
+            if (!hasUppercase) {
+              return "Password must contain at least one uppercase letter";
+            } 
+            if (!hasLowercase) {
+              return "Password must contain at least one lowercase letter";
             }
             return null;
           },
@@ -123,7 +142,7 @@ class _NewPasswordWidgetState extends State<NewPasswordWidget> {
 
         const SizedBox(height: 16),
 
-        // Confirm password input
+        // Confirm password input with comprehensive validation
         MyTextField(
           labelText: widget.confirmPasswordLabel ?? "Confirm Password",
           hintText: "Re-enter your password",
@@ -134,11 +153,14 @@ class _NewPasswordWidgetState extends State<NewPasswordWidget> {
           validator: (value) {
             if (value == null || value.isEmpty) {
               return "Please confirm your password";
-            } else if (value != widget.passwordController.text) {
+            } 
+            if (value != widget.passwordController.text) {
               return "Passwords do not match";
             }
+            // Only validate match if we have a value
             return null;
           },
+          onChanged: (_) => _validatePasswordConfirmation(),
         ),
       ],
     );

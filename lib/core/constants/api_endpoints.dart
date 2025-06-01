@@ -62,9 +62,30 @@ class ApiEndpoints {
   static const String users = '/api/users';
   /// Endpoints for general user operations
   
+  static const String userById = '/api/users/{id}';
+  /// GET: Retrieve a user by ID
+  /// Path param: id - UUID of the user
+  
+  static const String userByEmail = '/api/users/email/{email}';
+  /// GET: Retrieve a user by email
+  /// Path param: email - Email of the user
+  
+  static const String login = '/api/users/login';
+  /// POST: User login
+  /// Body: User credentials (username and password)
+  /// Returns: User object with authentication token
+
+  static const String studentRegister = '/api/students/register';
+  /// POST: Student registration
+  /// Body: User/Student registration details (username, email, password, etc.)
+  
+  static const String changePassword = '/api/users/{username}/change-password';
+  /// PUT: Change user password
+  /// Path param: username - Username of the user
+  /// Body: old and new password details
 
   //! ==================== Room Management Endpoints ========================================
-  
+
   // General Room endpoints
   static const String rooms = '/rooms';
   /// GET: Retrieve all rooms (both public and private)

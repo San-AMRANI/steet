@@ -28,15 +28,21 @@ class RoomDetailsPage extends StatelessWidget {
                       height: MediaQuery.of(context).size.width / 1.7,
                       width: MediaQuery.of(context).size.width,
                       child: CachedNetworkImage(
-                      imageUrl: room.imageUrl.isNotEmpty ? room.imageUrl : '',
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) =>
-                        const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Container(
-                        color: Theme.of(context).colorScheme.secondary,
-                        child: const Icon(Icons.broken_image,
-                          color: Colors.white, size: 48),
-                      ),
+                        imageUrl: room.imageUrl.isNotEmpty ? room.imageUrl : '',
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Center(
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3.0,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: Theme.of(context).colorScheme.secondary,
+                          child: const Icon(Icons.broken_image,
+                              color: Colors.white, size: 48),
+                        ),
                       ),
                     ),
                     Positioned(
@@ -48,7 +54,8 @@ class RoomDetailsPage extends StatelessWidget {
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                             begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,                            colors: [
+                            end: Alignment.bottomCenter,
+                            colors: [
                               Colors.transparent,
                               Theme.of(context)
                                   .colorScheme
@@ -131,7 +138,8 @@ class RoomDetailsPage extends StatelessWidget {
                           fontSize: 16,
                           color: Colors.grey,
                         ),
-                      ),                      SizedBox(height: 16),
+                      ),
+                      SizedBox(height: 16),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -145,9 +153,13 @@ class RoomDetailsPage extends StatelessWidget {
                           // Show member count with icon for PubRoom
                           if (room is PubRoom)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(15),
                               ),
                               child: Row(
@@ -167,7 +179,8 @@ class RoomDetailsPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
                       // Remove the Container with background and shadow, just show the member avatars/info directly
-                      if (room is PubRoom && (room as PubRoom).participation.isNotEmpty)
+                      if (room is PubRoom &&
+                          (room as PubRoom).participation.isNotEmpty)
                         Wrap(
                           spacing: 12.0,
                           runSpacing: 12.0,
@@ -179,12 +192,20 @@ class RoomDetailsPage extends StatelessWidget {
                               children: [
                                 CircleAvatar(
                                   radius: 24,
-                                  backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                  backgroundColor: Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withOpacity(0.2),
                                   child: Text(
-                                    (room as PubRoom).participation[index].idStudent.substring(0, 1).toUpperCase(),
+                                    (room as PubRoom)
+                                        .participation[index]
+                                        .idStudent
+                                        .substring(0, 1)
+                                        .toUpperCase(),
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      color: Theme.of(context).colorScheme.primary,
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
                                     ),
                                   ),
                                 ),
@@ -207,14 +228,19 @@ class RoomDetailsPage extends StatelessWidget {
                         ),
 
                       // Show "more" indicator if there are more than 10 participants
-                      if (room is PubRoom && (room as PubRoom).participation.length > 10)
+                      if (room is PubRoom &&
+                          (room as PubRoom).participation.length > 10)
                         Padding(
                           padding: const EdgeInsets.only(top: 12.0),
                           child: Center(
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: Text(
@@ -250,7 +276,9 @@ class RoomDetailsPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                (room is PrvRoom ? (room as PrvRoom).createdBy : 'Steet'), // Print if exists, else 'Steet'
+                                (room is PrvRoom
+                                    ? (room as PrvRoom).createdBy
+                                    : 'Steet'), // Print if exists, else 'Steet'
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -278,13 +306,12 @@ class RoomDetailsPage extends StatelessWidget {
           Positioned(
             top: 0,
             left: 0,
-            right: 0,            child: AppBar(
+            right: 0,
+            child: AppBar(
               leading: IconButton(
-                icon: const Icon(
-                  CupertinoIcons.back,
-                  color: Colors.black, // Changed to black as requested
-                  semanticLabel: "Back"
-                ),
+                icon: const Icon(CupertinoIcons.back,
+                    color: Colors.black, // Changed to black as requested
+                    semanticLabel: "Back"),
                 onPressed: () {
                   Navigator.pop(context);
                 },

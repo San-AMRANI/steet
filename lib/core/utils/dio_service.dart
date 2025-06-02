@@ -18,7 +18,7 @@ class DioService {
     ));
 
     // Add the auth interceptor
-    // _dio.interceptors.add(_createAuthInterceptor());
+    _dio.interceptors.add(_createAuthInterceptor());
   }
 
   Interceptor _createAuthInterceptor() {

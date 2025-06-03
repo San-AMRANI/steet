@@ -10,15 +10,7 @@ void main() async {
 
   runApp(
     ProviderScope(
-      child: Consumer(
-        builder: (context, ref, _) {
-          Future.microtask(() {
-            ref.read(authProvider.notifier).checkAuthStatus();
-          });
-          // Check authentication status on app start
-          return const MyApp();
-        },
-      ),
+      child: const MyApp(),
     ),
   );
 }

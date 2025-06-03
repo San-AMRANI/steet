@@ -14,7 +14,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> signIn(String usernameOrEmail, String password) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-      final (isAuthenticated, userId) =
+      final (isAuthenticated,isAdmin, userId) =
           await _authRepository.signIn(usernameOrEmail, password);
 
       if (isAuthenticated) {
@@ -22,6 +22,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           isAuthenticated: true,
           isLoading: false,
           userId: userId,
+          isAdmin: isAdmin,
         );
       } else {
         state = state.copyWith(error: 'Invalid credentials', isLoading: false);

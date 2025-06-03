@@ -7,11 +7,14 @@ import 'package:steet/presentation/providers/auth_provider.dart';
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch the auth state
-    final authState = ref.watch(authProvider);
     
+    ref.read(authProvider.notifier).checkAuthStatus();
+    final authState = ref.watch(authProvider);
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Steet',
@@ -29,11 +32,15 @@ class MyApp extends ConsumerWidget {
             onSurface: Color(0xFF000000),
             onError: Color.fromARGB(255, 0, 0, 0),
           )),
-          routes: {
+      routes: {
         '/welcome': (context) => const WelcomePage(),
         '/mobile': (context) => const MobileScafold(),
-        },
-      home: authState.isAuthenticated ? const MobileScafold() : const WelcomePage(),
+      },
+      home: authState.isAuthenticated
+          ? (authState.isAdmin
+              ? const Center(child: Text("wassim's scafold"))
+              : const MobileScafold())
+          : const WelcomePage(),
     );
   }
 }

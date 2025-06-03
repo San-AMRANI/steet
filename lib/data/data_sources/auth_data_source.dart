@@ -25,7 +25,7 @@ class AuthDataSource {
   final String _tokenKey = 'auth_token';
   final String _userIdKey = 'user_id';
 
-  Future<(bool, String?)> signIn(
+  Future<(bool,bool, String?)> signIn(
       String usernameOrEmail, String password) async {
     print(
         "AuthDataSource: signIn method called with usernameOrEmail: $usernameOrEmail");
@@ -45,13 +45,13 @@ class AuthDataSource {
         await _storageService.write(_tokenKey, response['accessToken']);
         await _storageService.write(_userIdKey, response['userId'].toString());
 
-        return (true, response['userId'].toString());
+        return (true, response['isAdmin'] as bool, response['userId'].toString());
       }
 
-      return (false, null);
+      return (false,false, null);
     } catch (e) {
       print("AuthDataSource: Exception in signIn: $e");
-      return (false, "Login failed: ${e.toString()}");
+      return (false,false, "Login failed: ${e.toString()}");
     }
   }
 

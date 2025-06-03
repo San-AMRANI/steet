@@ -7,14 +7,14 @@ class AuthRepositoryImp implements AuthRepository {
   AuthRepositoryImp({required this.dataSource});
 
   @override
-  Future<(bool, String?)> signIn(
+  Future<(bool,bool, String?)> signIn(
       String usernameOrEmail, String password) async {
     // returns a tuple of (isAuthenticated, userId)
     try {
       return await dataSource.signIn(usernameOrEmail, password);
     } catch (e) {
       // Handle or log the error as needed
-      return (false, null);
+      return (false,false, null);
     }
   }
 

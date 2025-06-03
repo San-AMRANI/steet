@@ -1,6 +1,7 @@
 
 class AuthState{
   final bool isAuthenticated;
+  final bool isAdmin;
   final String? userId;
   final String? success;
   final bool isRegistred;
@@ -9,6 +10,7 @@ class AuthState{
 
   AuthState({
     this.isAuthenticated = false,
+    this.isAdmin = false,
     this.userId,
     this.isLoading = false,
     this.error,
@@ -18,6 +20,7 @@ class AuthState{
 
   AuthState copyWith({
     bool? isAuthenticated,
+    bool? isAdmin,
     String? userId,
     bool? isLoading,
     String? error,
@@ -31,6 +34,7 @@ class AuthState{
       error: error ?? this.error,
       success: success ?? this.success,
       isRegistred: isRegistred ?? this.isRegistred,
+      isAdmin: isAdmin ?? this.isAdmin,
     );
   }
 }

@@ -2,7 +2,7 @@
 
 abstract class AuthRepository {
 
-  Future<(bool, String?)> signIn(String usernameOrEmail, String password);
+  Future<(bool,bool, String?)> signIn(String usernameOrEmail, String password);
 
   Future<(bool, String?)> signUp(Map<String, dynamic> userData);
 

@@ -12,7 +12,10 @@ class StudentRepositoryImp implements StudentRepository {
 
   @override
   Future<List<Student>> getStudents() async {
+    print('*********************************************1');
     final studentModels = await dataSource.getStudents();
+    print('*********************************************');
+    print('Received ${studentModels.length} students from data source');
     return studentModels.map((model) => model.toEntity()).toList();
   }
 
@@ -47,11 +50,21 @@ class StudentRepositoryImp implements StudentRepository {
   }
 
   @override
-  Future<String> uploadProfileImage(String studentId, Uint8List fileBytes) async {
+  Future<String> uploadProfileImage(
+      String studentId, Uint8List fileBytes) async {
     try {
       return await dataSource.uploadProfileImage(studentId, fileBytes);
     } catch (e) {
       throw Exception('Failed to upload profile image: $e');
+    }
+  }
+
+  @override
+  Future<List<int>> GetStudentCount() async {
+    try {
+      return await dataSource.getStudentCount();
+    } catch (e) {
+      throw Exception('Failed to get student count: $e');
     }
   }
   // @override
@@ -74,3 +87,4 @@ class StudentRepositoryImp implements StudentRepository {
   //   }
   // }
 }
+

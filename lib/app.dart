@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:steet/presentation/dashboard/pages/dashHome.dart';
 import 'package:steet/presentation/rooms/pages/welcome_page.dart';
+import 'package:steet/presentation/screens/admin_scafold.dart';
 import 'package:steet/presentation/screens/mobile_scafold.dart';
 import 'package:steet/presentation/providers/auth_provider.dart';
 

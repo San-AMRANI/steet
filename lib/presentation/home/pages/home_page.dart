@@ -41,10 +41,6 @@ class _HomePageBody extends StatelessWidget {
     return SafeArea(
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
-        // padding: EdgeInsets.only(
-        //   left: 10,
-        //   right: 10,
-        // ),
         child: Column(
           children: [
             RoomsList1(

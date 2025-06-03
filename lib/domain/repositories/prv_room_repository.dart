@@ -1,4 +1,5 @@
 import 'package:steet/data/models/prv_room_model.dart';
+import 'package:steet/domain/entities/prv_room.dart';
 
 abstract class PrvRoomRepository {
   Future<PrvRoomModel> createPrvRoom({
@@ -14,4 +15,5 @@ abstract class PrvRoomRepository {
     required String invitedStudentId,
     required String inviterId,
   });
+  Future<List<PrvRoom>> getPrvRooms();
 }

@@ -48,22 +48,23 @@ class StudentNotifier extends StateNotifier<StudentState> {
   }
   
   // Upload a profile image
-  Future<String?> uploadProfileImage(String studentId, Uint8List imageBytes) async {
+  Future<String?> uploadProfileImage(
+      String studentId, Uint8List imageBytes) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-  
-      final imageUrl = await _repository.uploadProfileImage(studentId, imageBytes);
-      
+      final imageUrl =
+          await _repository.uploadProfileImage(studentId, imageBytes);
+
       // If we have the current student loaded and it matches the ID, update the profile URL
       if (state.student != null && state.student!.id == studentId) {
-        final updatedStudent = state.student!.copyWith(profilePictureUrl: StudentModel.buildProfilePictureUrl(imageUrl));
-        
+        final updatedStudent = state.student!.copyWith(
+            profilePictureUrl: StudentModel.buildProfilePictureUrl(imageUrl));
+
         state = state.copyWith(student: updatedStudent, isLoading: false);
-        
       } else {
         state = state.copyWith(isLoading: false);
       }
-      
+
       return imageUrl;
     } catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);

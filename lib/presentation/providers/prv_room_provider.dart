@@ -6,6 +6,7 @@ import 'package:steet/domain/usecases/create_prv_room_usecase.dart';
 import 'package:steet/domain/usecases/send_invitation_usecase.dart';
 import 'package:steet/data/models/prv_room_model.dart';
 
+
 // Dependencies for private rooms
 final _prvDataSource = PrvRoomsDataSource();
 final PrvRoomRepository _prvRepository = PrvRoomRepositoryImpl(_prvDataSource);
@@ -112,3 +113,9 @@ class CreatePrvRoomParams {
 //     }
 //   }
 // }
+// Simple FutureProvider for private rooms
+
+// final _repository = PrvRoomRepositoryImpl(dataSource: PrvRoomsDataSource());
+// final prvRoomsProvider = FutureProvider.autoDispose<List<PrvRoom>>((ref) async {
+//   return _repository.getPrvRooms();
+// });

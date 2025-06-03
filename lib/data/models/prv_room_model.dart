@@ -1,3 +1,5 @@
+import 'package:steet/domain/entities/prv_room.dart';
+
 import 'room_model.dart';
 
 class PrvRoomModel extends RoomModel {
@@ -39,5 +41,20 @@ class PrvRoomModel extends RoomModel {
     json['memberships'] = memberships;
     json['imageUrl'] = imageUrl;
     return json;
+  }
+
+  List<PrvRoom> toEntity() {
+    return [
+      PrvRoom(
+        id: id,
+        name: name,
+        description: description,
+        imageUrl: imageUrl,
+        createdAt: createdAt,
+        isVisible: isVisible,
+        createdBy: createdBy,
+        memberships: memberships,
+      )
+    ];
   }
 }

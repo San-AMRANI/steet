@@ -14,7 +14,6 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch the auth state
     
-    ref.read(authProvider.notifier).checkAuthStatus();
     final authState = ref.watch(authProvider);
 
     return MaterialApp(

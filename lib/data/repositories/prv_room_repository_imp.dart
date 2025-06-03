@@ -1,5 +1,6 @@
 import 'package:steet/data/data_sources/prv_rooms_data_source.dart';
 import 'package:steet/data/models/prv_room_model.dart';
+import 'package:steet/domain/entities/prv_room.dart';
 
 import 'package:steet/domain/repositories/prv_room_repository.dart';
 
@@ -35,5 +36,12 @@ class PrvRoomRepositoryImpl implements PrvRoomRepository {
       invitedStudentId: invitedStudentId,
       inviterId: inviterId,
     );
+  }
+
+  @override
+  Future<List<PrvRoom>> getPrvRooms() {
+    return _dataSource.getPrvRooms().then((roomModels) {
+      return roomModels.expand((model) => model.toEntity()).toList();
+    });
   }
 }

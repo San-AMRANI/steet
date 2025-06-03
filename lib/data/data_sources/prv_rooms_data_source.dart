@@ -111,4 +111,21 @@ class PrvRoomsDataSource {
       throw Exception('Failed to send invitation: $e');
     }
   }
+
+  Future<List<PrvRoomModel>> getPrvRooms() async {
+    try {
+      final response = await _dioService.get(ApiEndpoints.allPrivateRooms);
+      if (response is List) {
+        return response.map((json) => PrvRoomModel.fromJson(json)).toList();
+      } else if (response is Map<String, dynamic> && response.containsKey('data')) {
+        return (response['data'] as List)
+            .map((json) => PrvRoomModel.fromJson(json))
+            .toList();
+      }
+      throw Exception('Unexpected response format');
+    } catch (e) {
+      print('Error fetching private rooms: $e');
+      throw Exception('Failed to fetch private rooms: $e');
+    }
+  }
 }

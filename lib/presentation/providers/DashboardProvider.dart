@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:steet/data/data_sources/student_data_source.dart';
 import 'package:steet/data/data_sources/prv_rooms_data_source.dart';
 import 'package:steet/data/data_sources/pub_rooms_data_source.dart';
+import 'package:steet/data/repositories/prv_room_repository_imp.dart';
 import 'package:steet/data/repositories/prv_room_repository_impl.dart';
 import 'package:steet/data/repositories/pub_room_repository_imp.dart';
 import 'package:steet/data/repositories/student_repository_imp.dart';
@@ -60,9 +61,9 @@ class DashboardNotifier extends Notifier<DashboardState> {
   DashboardState build() {
     _studentRepository = StudentRepositoryImp(dataSource: StudentDataSource());
     _pubRoomRepository =
-        PubRoomRepositoryImpl(dataSource: PubRoomsDataSource());
+        PubRoomRepositoryImpl(PubRoomsDataSource());
     _prvRoomRepository =
-        PrvRoomRepositoryImpl(dataSource: PrvRoomsDataSource());
+        PrvRoomRepositoryImpl( PrvRoomsDataSource());
     return const DashboardState();
   }
 

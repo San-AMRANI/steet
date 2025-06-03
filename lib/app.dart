@@ -13,6 +13,7 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch the auth state
+
     
     final authState = ref.watch(authProvider);
 

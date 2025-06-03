@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:steet/presentation/dashboard/pages/addAdminPage.dart';
 import 'package:steet/presentation/dashboard/pages/adminProfile.dart';
 import 'package:steet/presentation/dashboard/pages/dashHome.dart';
+import 'package:steet/presentation/profile/pages/profile_page.dart';
 
 class AdminScafold extends StatefulWidget {
   const AdminScafold({super.key});
@@ -18,6 +19,7 @@ class _AdminScafoldState extends State<AdminScafold> {
     DashHome(),
     // ModifyRessources(),
     AdminPage(),
+    ProfilePage()
   ];
 
   void _onItemTapped(int index) {

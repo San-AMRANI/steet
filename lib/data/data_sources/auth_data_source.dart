@@ -88,7 +88,7 @@ class AuthDataSource {
     final token = await _storageService.read(_tokenKey);
     final userId = await _storageService.read(_userIdKey);
     final isAdmin = await _storageService.read(_isAdminKey);
-    return (token != null, isAdmin as bool, userId);
+    return (token != null, isAdmin == 'true', userId);
   }
 
   Future<(bool, String?)> changePassword(

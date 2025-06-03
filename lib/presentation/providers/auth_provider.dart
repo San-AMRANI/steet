@@ -66,6 +66,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       print("Auth check error: $e, setting loading to false");
       state = state.copyWith(
         isAuthenticated: false,
+        isAdmin: false,
         userId: null,
         isLoading: false,
         error: e.toString(),

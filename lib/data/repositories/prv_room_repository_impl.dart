@@ -7,20 +7,6 @@ class PrvRoomRepositoryImpl implements PrvRoomRepository {
 
   PrvRoomRepositoryImpl({required this.dataSource});
 
-  @override
-  Future<List<PrvRoom>> getPrvRooms() {
-    return dataSource.getPrvRooms();
-  }
 
-  @override
-  Future<PrvRoom> getPrvRoom(String id) => dataSource.getPrvRoom(id);
 
-  @override
-  Future<void> createPrvRoom(PrvRoom room) => dataSource.createPrvRoom(room);
-
-  @override
-  Future<void> updatePrvRoom(PrvRoom room) => dataSource.updatePrvRoom(room);
-
-  @override
-  Future<void> deletePrvRoom(String id) => dataSource.deletePrvRoom(id);
 }

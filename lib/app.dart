@@ -40,7 +40,7 @@ class MyApp extends ConsumerWidget {
       },
       home: authState.isAuthenticated
           ? (authState.isAdmin
-              ? const Center(child: Text("wassim's scafold"))
+              ? const AdminScafold()
               : const MobileScafold())
           : const WelcomePage(),
     );

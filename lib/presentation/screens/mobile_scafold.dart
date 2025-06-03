@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:steet/presentation/profile/pages/profile_page.dart';
 import 'package:steet/presentation/home/pages/home_page.dart';
 import 'package:steet/presentation/rooms/pages/rooms_page.dart';
+import 'package:steet/presentation/notifications/pages/notifications_page.dart';
 
 class MobileScafold extends StatefulWidget {
   const MobileScafold({super.key});
@@ -24,7 +25,6 @@ class _MobileScafoldState extends State<MobileScafold> {
     setState(() {
       _selectedIndex = index;
     });
-    // Removed Navigator.pushReplacementNamed to fix navigation
   }
 
   @override
@@ -40,7 +40,14 @@ class _MobileScafoldState extends State<MobileScafold> {
         actions: [
           IconButton(
             icon: const Icon(CupertinoIcons.bell),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NotificationsPage(),
+                ),
+              );
+            },
           ),
         ],
       ),

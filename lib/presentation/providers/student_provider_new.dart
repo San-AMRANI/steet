@@ -3,7 +3,6 @@ import 'package:steet/data/data_sources/student_data_source.dart';
 import 'package:steet/data/repositories/student_repository_imp.dart';
 import 'package:steet/domain/entities/student.dart';
 
-// Use real data source in production
 final _dataSource = StudentDataSource();
 final _repository = StudentRepositoryImp(dataSource: _dataSource);
 
@@ -76,7 +75,8 @@ class StudentSearchNotifier extends StateNotifier<AsyncValue<List<Student>>> {
       // Perform client-side search
       final lowercaseQuery = query.toLowerCase();
       final results = _cachedStudents!.where((student) {
-        final fullName = '${student.firstName} ${student.lastName}'.toLowerCase();
+        final fullName =
+            '${student.firstName} ${student.lastName}'.toLowerCase();
         final email = student.email.toLowerCase();
         final userName = student.userName.toLowerCase();
 
@@ -106,7 +106,8 @@ class StudentSearchNotifier extends StateNotifier<AsyncValue<List<Student>>> {
     _cachedStudents = null;
     if (state.value?.isNotEmpty == true) {
       // If we were showing results, refresh them
-      final currentQuery = state.value?.isNotEmpty == true ? 'current_query' : '';
+      final currentQuery =
+          state.value?.isNotEmpty == true ? 'current_query' : '';
       await searchStudents(currentQuery);
     }
   }

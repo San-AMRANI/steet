@@ -5,6 +5,8 @@ import 'package:steet/domain/repositories/prv_room_repository.dart';
 import 'package:steet/domain/usecases/create_prv_room_usecase.dart';
 import 'package:steet/domain/usecases/send_invitation_usecase.dart';
 import 'package:steet/data/models/prv_room_model.dart';
+import 'package:steet/domain/entities/prv_room.dart';
+import 'package:steet/presentation/providers/auth_provider.dart';
 
 // Dependencies for private rooms
 final _prvDataSource = PrvRoomsDataSource();
@@ -82,33 +84,13 @@ class CreatePrvRoomParams {
   });
 }
 
-// // Provider for user's rooms (both private and public)
-// final userRoomsProvider =
-//     StateNotifierProvider<UserRoomsNotifier, AsyncValue<List<Room>>>((ref) {
-//   return UserRoomsNotifier(_prvRepository, _pubRepository);
-// });
+// Provider for all private rooms
+final prvRoomProvider = FutureProvider.autoDispose<List<PrvRoom>>((ref) async {
+  final authState = ref.watch(authProvider);
+  if (authState.userId == null) {
+    throw Exception('User not authenticated');
+  }
 
-// class UserRoomsNotifier extends StateNotifier<AsyncValue<List<Room>>> {
-//   final PrvRoomRepositoryImpl _prvRepository;
-//   final PubRoomRepositoryImpl _pubRepository;
-
-//   UserRoomsNotifier(this._prvRepository, this._pubRepository)
-//       : super(const AsyncValue.data([]));
-
-//   Future<void> loadUserRooms() async {
-//     try {
-//       state = const AsyncValue.loading();
-      
-//       // Load both private and public rooms
-//       final prvRooms = await _prvRepository.getUserRooms();
-//       final pubRooms = await _pubRepository.getUserRooms();
-      
-//       // Combine both lists
-//       final allRooms = [...prvRooms, ...pubRooms];
-      
-//       state = AsyncValue.data(allRooms);
-//     } catch (e, stack) {
-//       state = AsyncValue.error(e, stack);
-//     }
-//   }
-// }
+  final rooms = await _prvRepository.getAllPrivateRooms();
+  return rooms.map((model) => model.toEntity()).toList();
+});

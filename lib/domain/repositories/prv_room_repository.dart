@@ -14,4 +14,6 @@ abstract class PrvRoomRepository {
     required String invitedStudentId,
     required String inviterId,
   });
+
+  Future<List<PrvRoomModel>> getAllPrivateRooms();
 }

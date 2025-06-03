@@ -7,6 +7,7 @@ import 'package:steet/presentation/providers/prv_room_provider.dart';
 import 'package:steet/presentation/widgets/my_text_field.dart';
 import 'package:steet/presentation/widgets/my_text_icon_button.dart';
 import 'package:steet/presentation/rooms/widgets/search_members_dialog.dart';
+import 'package:steet/presentation/providers/auth_provider.dart';
 
 class CreateRoomPage extends ConsumerStatefulWidget {
   final bool isAdmin;
@@ -41,6 +42,14 @@ class _CreateRoomPageState extends ConsumerState<CreateRoomPage> {
   }
 
   void _onCreateRoom() {
+    final authState = ref.read(authProvider);
+    if (authState.userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('You must be logged in to create a room')),
+      );
+      return;
+    }
+
     if (_imageFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select an image')),
@@ -54,15 +63,15 @@ class _CreateRoomPageState extends ConsumerState<CreateRoomPage> {
       );
       return;
     }
+
     ref.read(createPrvRoomProvider.notifier).createRoomAndSendInvitations(
-          name: nameController.text,
-          description: descriptionController.text,
-          isVisible: isVisible,
-          createdBy:
-              'c8d6618f-0b4c-4897-bb99-45d93d304f41', // Replace with actual user ID
-          imagePath: _imageFile!.path,
-          invitedMembers: selectedMembers.map((s) => s.id).toList(),
-        );
+      name: nameController.text,
+      description: descriptionController.text,
+      isVisible: isVisible,
+      createdBy: authState.userId!,
+      imagePath: _imageFile!.path,
+      invitedMembers: selectedMembers.map((s) => s.id).toList(),
+    );
   }
 
   void _onInviteMembers() async {

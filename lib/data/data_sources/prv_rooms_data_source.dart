@@ -111,4 +111,19 @@ class PrvRoomsDataSource {
       throw Exception('Failed to send invitation: $e');
     }
   }
+
+  Future<List<PrvRoomModel>> getAllPrivateRooms() async {
+    try {
+      final response = await _dioService.get(ApiEndpoints.allPrivateRooms);
+      final List<dynamic> data = response is Map<String, dynamic>
+          ? response['data'] as List<dynamic>
+          : response as List<dynamic>;
+
+      return data.map((room) => PrvRoomModel.fromJson(room)).toList();
+    } catch (e) {
+      print('Error getting all private rooms: $e');
+      throw Exception('Failed to get private rooms: $e');
+    }
+  }
+
 }

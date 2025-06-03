@@ -5,10 +5,11 @@ import 'package:steet/domain/entities/prv_room.dart';
 import 'package:steet/domain/entities/pub_room.dart';
 import 'package:steet/presentation/rooms/widgets/room_card.dart';
 import 'package:steet/presentation/rooms/pages/create_room_page.dart';
-import 'package:steet/data/data_sources/mock_rooms_data_source.dart';
+import 'package:steet/presentation/providers/prv_room_provider.dart';
+import 'package:steet/presentation/providers/pub_room_provider.dart';
+import 'package:steet/presentation/providers/auth_provider.dart';
 
-// TODO: Replace with actual user ID from auth provider when available
-const currentUserId = 'current_user_id';
+// const currentUserId = 'current_user_id';
 
 class RoomsPage extends ConsumerStatefulWidget {
   const RoomsPage({super.key});
@@ -20,7 +21,6 @@ class RoomsPage extends ConsumerStatefulWidget {
 class _RoomsPageState extends ConsumerState<RoomsPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final _mockDataSource = MockRoomsDataSource();
 
   // State variables to hold the rooms
   List<Room> _ownedRooms = [];
@@ -43,25 +43,37 @@ class _RoomsPageState extends ConsumerState<RoomsPage>
   }
 
   Future<void> _loadRooms() async {
+    final authState = ref.read(authProvider);
+    if (authState.userId == null) {
+      setState(() {
+        _isLoading = false;
+        _error = 'User not authenticated';
+      });
+      return;
+    }
+
     try {
       setState(() {
         _isLoading = true;
         _error = null;
       });
 
-      // Load all types of rooms
-      final createdRooms =
-          await _mockDataSource.getUserCreatedPrvRooms(currentUserId);
-      final memberRooms = await _mockDataSource.getUserPrvRooms(currentUserId);
-      final publicRooms = await _mockDataSource.getPubRooms();
+      // Get private rooms using prvRoomProvider
+      final prvRoomsAsync = await ref.read(prvRoomProvider.future);
+      final currentUserId = authState.userId!;
+      
+      // Filter private rooms into owned and member rooms
+      final createdRooms = prvRoomsAsync.where((room) => room.createdBy == currentUserId).toList();
+      final memberRooms = prvRoomsAsync.where((room) => 
+        room.memberships.contains(currentUserId) && room.createdBy != currentUserId
+      ).toList();
 
-      // Filter member rooms to exclude owned rooms
-      final nonOwnedMemberRooms =
-          memberRooms.where((room) => room.createdBy != currentUserId).toList();
+      // Get public rooms using pubRoomProvider
+      final publicRooms = await ref.read(pubRoomsProvider.future);
 
       setState(() {
         _ownedRooms = createdRooms;
-        _memberRooms = nonOwnedMemberRooms;
+        _memberRooms = memberRooms;
         _publicRooms = publicRooms;
         _isLoading = false;
       });

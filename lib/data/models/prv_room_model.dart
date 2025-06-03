@@ -1,4 +1,6 @@
+import 'package:steet/domain/entities/prv_room.dart';
 import 'room_model.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class PrvRoomModel extends RoomModel {
   final bool isVisible;
@@ -17,15 +19,18 @@ class PrvRoomModel extends RoomModel {
   });
 
   factory PrvRoomModel.fromJson(Map<String, dynamic> json) {
+    final String? rawImageUrl = json['imageUrl'] as String?;
+    final String imageUrl = buildRoomPictureUrl(rawImageUrl) ?? '/rooms/room-image/default.jpg';
+
     return PrvRoomModel(
       id: json['id'],
       name: json['name'],
       description: json['description'],
-      imageUrl: json['imageUrl'],
+      imageUrl: imageUrl,
       createdAt: DateTime.parse(json['createdAt']),
       isVisible: json['visible'] ?? false,
       createdBy: json['createdBy'],
-      memberships: json['memberships'] != null 
+      memberships: json['memberships'] != null
           ? List<String>.from(json['memberships'])
           : [],
     );
@@ -39,5 +44,24 @@ class PrvRoomModel extends RoomModel {
     json['memberships'] = memberships;
     json['imageUrl'] = imageUrl;
     return json;
+  }
+
+  PrvRoom toEntity() {
+    return PrvRoom(
+      id: id,
+      name: name,
+      description: description,
+      imageUrl: imageUrl,
+      createdAt: createdAt,
+      isVisible: isVisible,
+      createdBy: createdBy,
+      memberships: memberships,
+    );
+  }
+
+  static String? buildRoomPictureUrl(String? rawUrl) {
+    if (rawUrl == null || rawUrl.isEmpty) return null;
+    final baseUrl = dotenv.env['BASE_URL'] ?? '';
+    return baseUrl + rawUrl;
   }
 }

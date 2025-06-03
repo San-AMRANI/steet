@@ -36,4 +36,12 @@ class PrvRoomRepositoryImpl implements PrvRoomRepository {
       inviterId: inviterId,
     );
   }
+
+  @override
+  Future<List<PrvRoomModel>> getAllPrivateRooms() async {
+    return await _dataSource.getAllPrivateRooms();
+  }
+
+
+
 }

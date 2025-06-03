@@ -7,7 +7,7 @@ import 'package:steet/domain/entities/pub_room.dart';
 final _dataSource = PubRoomsDataSource();
 
 // Single repository instance
-final _repository = PubRoomRepositoryImpl(_dataSource);
+final _repository = PubRoomRepositoryImpl(dataSource: _dataSource);
 
 // Simple FutureProvider for public rooms
 final pubRoomsProvider = FutureProvider.autoDispose<List<PubRoom>>((ref) async {

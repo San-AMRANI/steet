@@ -4,6 +4,7 @@ import 'package:steet/data/data_sources/student_data_source.dart';
 import 'package:steet/data/models/student_model.dart';
 import 'package:steet/data/repositories/student_repository_imp.dart';
 import 'package:steet/domain/entities/student.dart';
+import 'package:steet/domain/repositories/student_repository.dart';
 
 // Create a state class to represent the student data state
 class StudentState {
@@ -76,23 +77,25 @@ class StudentNotifier extends Notifier<StudentState> {
       state = state.copyWith(error: e.toString(), isLoading: false);
     }
   }
+
   // Upload a profile image
-  Future<String?> uploadProfileImage(String studentId, Uint8List imageBytes) async {
+  Future<String?> uploadProfileImage(
+      String studentId, Uint8List imageBytes) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
-  
-      final imageUrl = await _repository.uploadProfileImage(studentId, imageBytes);
-      
+      final imageUrl =
+          await _repository.uploadProfileImage(studentId, imageBytes);
+
       // If we have the current student loaded and it matches the ID, update the profile URL
       if (state.student != null && state.student!.id == studentId) {
-        final updatedStudent = state.student!.copyWith(profilePictureUrl: StudentModel.buildProfilePictureUrl(imageUrl));
-        
+        final updatedStudent = state.student!.copyWith(
+            profilePictureUrl: StudentModel.buildProfilePictureUrl(imageUrl));
+
         state = state.copyWith(student: updatedStudent, isLoading: false);
-        
       } else {
         state = state.copyWith(isLoading: false);
       }
-      
+
       return imageUrl;
     } catch (e) {
       state = state.copyWith(error: e.toString(), isLoading: false);
@@ -102,7 +105,8 @@ class StudentNotifier extends Notifier<StudentState> {
 }
 
 // Create the provider
-final studentNotifierProvider = NotifierProvider<StudentNotifier, StudentState>(() {
+final studentNotifierProvider =
+    NotifierProvider<StudentNotifier, StudentState>(() {
   return StudentNotifier();
 });
 
@@ -122,3 +126,18 @@ final studentErrorProvider = Provider<String?>((ref) {
 final isLoadingStudentProvider = Provider<bool>((ref) {
   return ref.watch(studentNotifierProvider).isLoading;
 });
+
+// final studentRepositoryProvider = Provider<StudentRepository>((ref) {
+//   return StudentRepositoryImp(dataSource: StudentDataSource());
+// });
+
+// final studentsProvider = FutureProvider<List<Student>>((ref) async {
+//   final repository = ref.watch(studentRepositoryProvider);
+//   return repository.getStudents();
+// });
+
+// final studentByIdProvider =
+//     FutureProvider.family<Student?, String>((ref, id) async {
+//   final repository = ref.watch(studentRepositoryProvider);
+//   return repository.getStudentById(id);
+// });

@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:typed_data';
 
 import 'package:steet/domain/entities/student.dart';
@@ -10,5 +11,5 @@ abstract class StudentRepository {
   // Future<void> addStudent(Student student);
   Future<Student?> updateStudent(Student student);
   Future<String> uploadProfileImage(String studentId, Uint8List fileBytes);
-  // Future<void> deleteStudent(String id);
+  Future<List<int>> GetStudentCount();
 }

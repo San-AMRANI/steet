@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:steet/presentation/dashboard/pages/dashHome.dart';
 import 'package:steet/presentation/rooms/pages/welcome_page.dart';
+import 'package:steet/presentation/screens/admin_scafold.dart';
 import 'package:steet/presentation/screens/mobile_scafold.dart';
 
 class MyApp extends StatelessWidget {
@@ -9,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool isLoggedIn = true; // Replace with your actual login check logic
-    
+
     return ProviderScope(
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
@@ -29,7 +31,9 @@ class MyApp extends StatelessWidget {
               onError: Color.fromARGB(255, 0, 0, 0),
             )),
         routes: {
-          '/': (context) => isLoggedIn ? const MobileScafold() : const WelcomePage(),
+          // '/': (context) =>
+          //     isLoggedIn ? const MobileScafold() : const WelcomePage(),
+          '/': (context) => const AdminScafold(),
         },
       ),
     );

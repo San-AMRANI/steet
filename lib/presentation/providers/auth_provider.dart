@@ -53,12 +53,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
     print("Starting auth check, setting loading to true");
     state = state.copyWith(isLoading: true);
     try {
-      final (isAuthenticated, userId) = await _authRepository.isAuthenticated();
+      final (isAuthenticated, isAdmin , userId ) = await _authRepository.isAuthenticated();
       print(
           "Auth check complete: authenticated=$isAuthenticated, setting loading to false");
       state = state.copyWith(
         isAuthenticated: isAuthenticated,
         userId: userId,
+        isAdmin: isAdmin,
         isLoading: false,
       );
     } catch (e) {

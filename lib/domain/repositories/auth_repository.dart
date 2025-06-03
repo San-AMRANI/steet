@@ -8,7 +8,7 @@ abstract class AuthRepository {
 
   Future<void> signOut();
 
-  Future<(bool, String?)> isAuthenticated();
+  Future<(bool, bool, String?)> isAuthenticated();
 
   Future<(bool, String?)> changePassword(
       String username,

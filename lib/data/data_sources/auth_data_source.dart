@@ -24,6 +24,7 @@ class AuthDataSource {
 
   final String _tokenKey = 'auth_token';
   final String _userIdKey = 'user_id';
+  final String _isAdminKey = 'is_admin';
 
   Future<(bool,bool, String?)> signIn(
       String usernameOrEmail, String password) async {
@@ -44,6 +45,7 @@ class AuthDataSource {
         // Store token and userId in secure storage
         await _storageService.write(_tokenKey, response['accessToken']);
         await _storageService.write(_userIdKey, response['userId'].toString());
+        await _storageService.write(_isAdminKey, response['isAdmin'].toString());
 
         return (true, response['isAdmin'] as bool, response['userId'].toString());
       }
@@ -81,11 +83,12 @@ class AuthDataSource {
     await _storageService.clearAll();
   }
 
-  Future<(bool, String?)> isAuthenticated() async {
+  Future<(bool,bool, String?)> isAuthenticated() async {
     // Check if the user is authenticated
     final token = await _storageService.read(_tokenKey);
     final userId = await _storageService.read(_userIdKey);
-    return (token != null, userId);
+    final isAdmin = await _storageService.read(_isAdminKey);
+    return (token != null, isAdmin as bool, userId);
   }
 
   Future<(bool, String?)> changePassword(

@@ -41,12 +41,12 @@ class AuthRepositoryImp implements AuthRepository {
   }
 
   @override
-  Future<(bool, String?)> isAuthenticated() async {
+  Future<(bool, bool,String?)> isAuthenticated() async {
     try {
       return await dataSource.isAuthenticated();
     } catch (e) {
       // Handle or log the error as needed
-      return (false, null);
+      return (false, false, null);
     }
   }
 
